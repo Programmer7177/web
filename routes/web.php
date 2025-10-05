@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FacilityReportController;
-
+ use App\Http\Controllers\ReportCommentController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -24,6 +24,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Route untuk semua proses CRUD Laporan Fasilitas
     // Baris inilah yang membuat route 'reports.create' ada
     Route::resource('reports', FacilityReportController::class);
+
+    Route::post('reports/{report}/comments', [ReportCommentController::class, 'store'])->name('comments.store');
     
 });
 

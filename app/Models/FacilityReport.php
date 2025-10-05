@@ -15,11 +15,13 @@ class FacilityReport extends Model
         'user_id',
         'category_id',
         'asset_id',
+        'instansi_id', // Pastikan ini sudah ada
         'assigned_to',
         'title',
         'description',
         'location',
         'status',
+        'attachment_path', // Pastikan ini sudah ada
     ];
 
     /**
@@ -60,5 +62,19 @@ class FacilityReport extends Model
     public function statusUpdates()
     {
         return $this->hasMany(StatusUpdate::class, 'report_id');
+    }
+
+    /**
+     * TAMBAHKAN FUNGSI INI
+     * Laporan ini terkait dengan satu Instansi.
+     */
+    public function instansi()
+    {
+        return $this->belongsTo(Instansi::class, 'instansi_id');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(ReportComment::class, 'facility_report_id');
     }
 }

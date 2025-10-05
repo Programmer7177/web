@@ -16,7 +16,17 @@ class FacilityReportController extends Controller
      */
     public function index()
     {
-        $reports = FacilityReport::latest()->paginate(10);
+        // Cek peran user yang sedang login
+        if (Auth::user()->role->name == 'admin_sarpras') {
+            // Jika admin, tampilkan semua laporan dari yang terbaru
+            $reports = FacilityReport::latest()->paginate(10);
+        } else {
+            // Jika bukan admin (mahasiswa), tampilkan hanya laporannya sendiri
+            $reports = FacilityReport::where('user_id', Auth::id())
+                                     ->latest()
+                                     ->paginate(10);
+        }
+
         return view('reports.index', compact('reports'));
     }
 
@@ -87,32 +97,48 @@ class FacilityReportController extends Controller
      */
     public function update(Request $request, FacilityReport $report)
     {
-        $rules = [
-            'title' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,category_id',
-            'instansi_id' => 'required|exists:instansi,instansi_id',
-            'description' => 'required|string',
-            'location' => 'required|string|max:255',
-            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
-        ];
+        // Cek apakah pengguna adalah admin
+        $isAdmin = Auth::user()->role->name == 'admin_sarpras';
 
-        // Tambahkan aturan validasi status HANYA jika pengguna adalah admin
-        if (Auth::user()->role->name == 'admin_sarpras') {
-            $rules['status'] = 'required|string';
+        if ($isAdmin) {
+            // Aturan validasi HANYA untuk admin
+            $rules = [
+                'status' => 'required|string',
+                'admin_comment' => 'nullable|string',
+            ];
+        
+            $request->validate($rules);
+        
+            // Data yang diupdate HANYA status
+            $dataToUpdate = [
+                'status' => $request->status,
+            ];
+
+            // Jika ada komentar dari admin, kita akan simpan di langkah selanjutnya
+            if ($request->filled('admin_comment')) {
+                $report->comments()->create([
+                'user_id' => Auth::id(),
+                'body' => $request->admin_comment,
+                ]);
+            }
+
+        } else {
+            // Aturan validasi untuk user biasa (sama seperti sebelumnya)
+            $rules = [
+                'title' => 'required|string|max:255',
+                'category_id' => 'required|exists:categories,category_id',
+                'instansi_id' => 'required|exists:instansi,instansi_id',
+                'description' => 'required|string',
+                'location' => 'required|string|max:255',
+                'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            ];
+        
+            $request->validate($rules);
+            $dataToUpdate = $request->except(['attachment']);
         }
 
-        $request->validate($rules);
-
-        // Ambil semua data kecuali status dan attachment
-        $dataToUpdate = $request->except(['status', 'attachment']);
-
-        // Update status HANYA jika pengguna adalah admin
-        if (Auth::user()->role->name == 'admin_sarpras') {
-            $dataToUpdate['status'] = $request->status;
-        }
-    
-        // Logika untuk menangani update file lampiran
-        if ($request->hasFile('attachment')) {
+        // Logika untuk menangani update file lampiran (hanya untuk user)
+        if (!$isAdmin && $request->hasFile('attachment')) {
             if ($report->attachment_path) {
                 Storage::disk('public')->delete($report->attachment_path);
             }
@@ -122,8 +148,12 @@ class FacilityReportController extends Controller
 
         $report->update($dataToUpdate);
 
-        return redirect()->route('reports.index')
-                         ->with('success', 'Laporan berhasil diperbarui!');
+        // Redirect ke halaman yang sesuai
+        if ($isAdmin) {
+            return redirect()->route('dashboard')->with('success', 'Status laporan berhasil diperbarui!');
+        } else {
+            return redirect()->route('reports.index')->with('success', 'Laporan berhasil diperbarui!');
+        }
     }
 
     /**
@@ -137,7 +167,17 @@ class FacilityReportController extends Controller
 
         $report->delete();
 
-        return redirect()->route('reports.index')
-                         ->with('success', 'Laporan berhasil dihapus!');
-    }
+        // REVISI: Tambahkan logika redirect berdasarkan peran
+        if (Auth::user()->role->name == 'admin_sarpras') {
+            // Jika admin, kembalikan ke dashboard admin
+            return redirect()->route('dashboard')
+                             ->with('success', 'Laporan berhasil dihapus!');
+        } else {
+            // Jika user biasa, kembalikan ke daftar laporannya sendiri
+            return redirect()->route('reports.index')
+                             ->with('success', 'Laporan berhasil dihapus!');
+        }
+}
+
+
 }
