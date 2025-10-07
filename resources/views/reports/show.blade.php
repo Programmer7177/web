@@ -73,7 +73,7 @@
                 @endif
 
                 @if(!$userRating)
-                <form action="{{ route('reports.rating.store', $report->report_id) }}" method="POST" class="row g-3">
+                <form action="{{ url('reports/'.$report->report_id.'/rating') }}" method="POST" class="row g-3">
                     @csrf
                     <div class="col-12">
                         <label class="form-label">Penilaian</label>
