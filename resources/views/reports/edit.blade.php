@@ -1,7 +1,6 @@
 @extends(Auth::user()->role->name == 'admin_sarpras' ? 'layouts.admin' : 'layouts.app')
 
 @section('content')
-<div class="container">
     <div class="card shadow-sm">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
             <h2 class="mb-0">Edit Laporan</h2>
@@ -91,6 +90,5 @@
             </form>
         </div>
     </div>
-</div>
 @endsection
 

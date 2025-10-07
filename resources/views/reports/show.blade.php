@@ -1,7 +1,6 @@
 @extends(Auth::user()->role->name == 'admin_sarpras' ? 'layouts.admin' : 'layouts.app')
 
 @section('content')
-<div class="container">
     {{-- KARTU DETAIL LAPORAN --}}
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
@@ -52,7 +51,6 @@
                 </div>
             </div>
         </div>
-    </div>
 
     {{-- BAGIAN KOMENTAR --}}
     <div class="card shadow-sm">

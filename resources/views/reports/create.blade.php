@@ -35,7 +35,6 @@
 @endpush
 
 @section('content')
-<div class="container">
     <div class="form-container">
         <h2>Pembuatan Laporan</h2>
         
@@ -85,5 +84,4 @@
             <button type="submit" class="btn btn-primary btn-submit">Kirim Laporan</button>
         </form>
     </div>
-</div>
 @endsection

@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
     <div class="card shadow-sm">
         <div class="card-header bg-white">
             <div class="d-flex justify-content-between align-items-center">
@@ -59,5 +58,4 @@
             </div>
         </div>
     </div>
-</div>
 @endsection

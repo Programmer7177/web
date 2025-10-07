@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\ServiceProvider; // <-- TAMBAHKAN BARIS INI
+
 return [
 
     /*
@@ -122,5 +124,15 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
+
+    'providers' => ServiceProvider::defaultProviders()->merge([
+        // ...
+        App\Providers\AppServiceProvider::class,
+        App\Providers\AuthServiceProvider::class,
+        // App\Providers\BroadcastServiceProvider::class,
+        App\Providers\EventServiceProvider::class,
+        App\Providers\RouteServiceProvider::class,
+        App\Providers\ComposerServiceProvider::class, // Ini sudah benar
+    ])->toArray(),
 
 ];
