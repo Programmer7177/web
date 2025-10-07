@@ -77,4 +77,12 @@ class FacilityReport extends Model
     {
         return $this->hasMany(ReportComment::class, 'facility_report_id');
     }
+
+    /**
+     * Daftar rating untuk laporan ini.
+     */
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class, 'report_id');
+    }
 }

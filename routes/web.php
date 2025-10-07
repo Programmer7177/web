@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FacilityReportController;
 use App\Http\Controllers\ReportCommentController;
 use App\Http\Controllers\PageController; // REVISI: Backslash yang benar
+use App\Http\Controllers\RatingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +29,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Route untuk menyimpan komentar
     Route::post('reports/{report}/comments', [ReportCommentController::class, 'store'])->name('comments.store');
+
+    // Route untuk menyimpan rating laporan yang telah selesai
+    Route::post('reports/{report}/rating', [RatingController::class, 'store'])->name('reports.rating.store');
 
     // Route untuk halaman "Tentang Layanan"
     Route::get('/tentang-layanan', [PageController::class, 'about'])->name('pages.about');
