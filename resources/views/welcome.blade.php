@@ -6,6 +6,20 @@
     <title>Lapor UNAIR — Pelaporan Masalah Kampus</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://unpkg.com/aos@next/dist/aos.css" rel="stylesheet">
+    <script>
+        (function() {
+            try {
+                if ('scrollRestoration' in history) {
+                    history.scrollRestoration = 'manual';
+                }
+                // Hentikan loncatan awal ke #login-section saat halaman pertama kali dimuat
+                if (window.location.hash === '#login-section') {
+                    history.replaceState(null, document.title, window.location.pathname + window.location.search);
+                    window.scrollTo(0, 0);
+                }
+            } catch (e) {}
+        })();
+    </script>
 
     <style>
         /* Nonaktifkan smooth scroll agar tidak auto scroll */
@@ -271,7 +285,7 @@
                         @csrf
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input id="email" class="form-control" type="email" name="email" :value="old('email')" required autofocus>
+                            <input id="email" class="form-control" type="email" name="email" :value="old('email')" required>
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
