@@ -139,6 +139,18 @@
             transform: none;
         }
     }
+
+    /* Bound chart areas to prevent layout expansion */
+    .chart-container {
+        position: relative;
+        height: 320px;
+        max-height: 60vh;
+    }
+    .chart-doughnut-container {
+        position: relative;
+        height: 240px;
+        max-height: 50vh;
+    }
 </style>
 @endpush
 
@@ -208,21 +220,25 @@
     {{-- Widget Interaktif: Tren 7 Hari & Distribusi Status --}}
     <div class="row g-4 mb-5">
         <div class="col-lg-8">
-            <div class="card border-0 shadow-sm h-100">
+            <div class="card border-0 shadow-sm">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="mb-0">Tren Laporan 7 Hari Terakhir</h5>
                         <span class="text-muted small">Semua laporan</span>
                     </div>
-                    <canvas id="reportsTrendChart" height="120"></canvas>
+                    <div class="chart-container">
+                        <canvas id="reportsTrendChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-lg-4">
-            <div class="card border-0 shadow-sm h-100">
+            <div class="card border-0 shadow-sm">
                 <div class="card-body">
                     <h5 class="mb-3">Distribusi Status</h5>
-                    <canvas id="statusDoughnutChart" height="200"></canvas>
+                    <div class="chart-doughnut-container">
+                        <canvas id="statusDoughnutChart"></canvas>
+                    </div>
                     <div class="mt-3 d-flex flex-column gap-1">
                         <div class="d-flex justify-content-between"><span class="badge bg-secondary">Terkirim</span><span>{{ $statusCounts['pending'] ?? $pendingCount }}</span></div>
                         <div class="d-flex justify-content-between"><span class="badge bg-info text-dark">Dalam Proses</span><span>{{ $statusCounts['in_progress'] ?? $inProgressCount }}</span></div>
@@ -362,7 +378,9 @@ document.addEventListener('DOMContentLoaded', function () {
       },
       options: {
         plugins: { legend: { display: false } },
-        cutout: '60%'
+        cutout: '60%',
+        responsive: true,
+        maintainAspectRatio: false
       }
     });
   }
