@@ -151,8 +151,30 @@
         </div>
     @endif
 
-    {{-- BAGIAN KOMENTAR - Hanya tampil jika user belum memberikan rating --}}
-    @if(Auth::id() !== $report->user_id || !$userRating)
+    {{-- PESAN UNTUK ADMIN JIKA LAPORAN SUDAH COMPLETED DAN DIRATING --}}
+    @if(Auth::user()->role->name == 'admin_sarpras' && $report->status === 'completed' && $report->ratings->count() > 0)
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <i class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+                <h5 class="text-success">Laporan Selesai dan Sudah Dirating</h5>
+                <p class="text-muted mb-0">User telah memberikan rating untuk laporan ini. Diskusi tidak tersedia untuk laporan yang sudah selesai dan dirating.</p>
+            </div>
+        </div>
+    @endif
+
+    {{-- PESAN UNTUK ADMIN JIKA LAPORAN COMPLETED TAPI BELUM DIRATING --}}
+    @if(Auth::user()->role->name == 'admin_sarpras' && $report->status === 'completed' && $report->ratings->count() == 0)
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <i class="bi bi-hourglass-split text-warning fs-1 mb-3"></i>
+                <h5 class="text-warning">Menunggu Rating dari User</h5>
+                <p class="text-muted mb-0">Laporan sudah selesai, menunggu user memberikan rating. Diskusi masih tersedia hingga user memberikan rating.</p>
+            </div>
+        </div>
+    @endif
+
+    {{-- BAGIAN KOMENTAR - Hanya tampil jika laporan belum completed atau belum dirating --}}
+    @if($report->status !== 'completed' || ($report->status === 'completed' && Auth::id() === $report->user_id && !$userRating))
     <div class="card shadow-sm">
         <div class="card-header bg-white">
             <h4 class="mb-0">Diskusi / Tindak Lanjut</h4>
