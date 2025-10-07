@@ -110,6 +110,47 @@
         </div>
     @endif
 
+    {{-- BAGIAN RATING UNTUK ADMIN --}}
+    @if(Auth::user()->role->name == 'admin_sarpras' && $report->status === 'completed')
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h4 class="mb-0">Rating dari User</h4>
+            </div>
+            <div class="card-body">
+                @if($report->ratings->count() > 0)
+                    @php
+                        $rating = $report->ratings->first();
+                    @endphp
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div>
+                            <p class="mb-1"><strong>Rating:</strong></p>
+                            <x-star-rating :rating="$rating->rating_value" :interactive="false" size="lg" />
+                            <small class="text-muted">({{ $rating->rating_value }}/5 bintang)</small>
+                        </div>
+                    </div>
+                    @if($rating->comment)
+                        <div>
+                            <p class="mb-1"><strong>Komentar User:</strong></p>
+                            <div class="bg-light p-3 rounded">
+                                <p class="mb-0">{{ $rating->comment }}</p>
+                            </div>
+                        </div>
+                    @endif
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <i class="bi bi-clock"></i> Rating diberikan pada {{ $rating->created_at->format('d M Y, H:i') }}
+                        </small>
+                    </div>
+                @else
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-star fs-1"></i>
+                        <p class="mb-0">User belum memberikan rating untuk laporan ini</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endif
+
     {{-- BAGIAN KOMENTAR - Hanya tampil jika user belum memberikan rating --}}
     @if(Auth::id() !== $report->user_id || !$userRating)
     <div class="card shadow-sm">
