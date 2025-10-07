@@ -211,15 +211,15 @@
                 <h3 class="mb-4">Jumlah Laporan Saat Ini</h3>
                 <div class="row g-4">
                     <div class="col-4">
-                        <div class="counter-value" data-countup data-target="3">0</div>
+                        <div class="counter-value" data-countup data-target="{{ $pendingCount ?? 0 }}">0</div>
                         <p class="mb-0">Terkirim</p>
                     </div>
                     <div class="col-4">
-                        <div class="counter-value" data-countup data-target="10">0</div>
+                        <div class="counter-value" data-countup data-target="{{ $inProgressCount ?? 0 }}">0</div>
                         <p class="mb-0">Dalam Proses</p>
                     </div>
                     <div class="col-4">
-                        <div class="counter-value" data-countup data-target="25">0</div>
+                        <div class="counter-value" data-countup data-target="{{ $completedCount ?? 0 }}">0</div>
                         <p class="mb-0">Selesai</p>
                     </div>
                 </div>
