@@ -7,7 +7,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         html { scroll-behavior: smooth; }
-        body { background: #f7fafc; color: #0f172a; }
+        /* Sky-blue fresh background with subtle gradient and vignette */
+        body {
+            background: radial-gradient(1200px 500px at 20% 0%, rgba(255,255,255,.9), rgba(255,255,255,.6) 40%, rgba(14,165,233,.08) 70%),
+                        linear-gradient(180deg, #e0f2fe 0%, #f0f9ff 35%, #e6f4ff 100%);
+            color: #0f172a;
+        }
 
         .navbar-brand img { height: 36px; }
         .navbar .btn-login { border-radius: 999px; padding: .45rem 1rem; }
@@ -25,9 +30,11 @@
             filter: blur(2px);
             z-index: 0;
         }
-        .hero-art img { position: relative; z-index: 1; width: 100%; max-width: 520px; }
+        .hero-art .blob { animation: floaty 9s ease-in-out infinite alternate; }
+        @keyframes floaty { from { transform: translate(15%, -10%) scale(1); } to { transform: translate(12%, -12%) scale(1.06); } }
+        .hero-art img { position: relative; z-index: 1; width: 100%; max-width: 520px; will-change: transform; transition: transform .15s linear; }
 
-        .hero-wave { margin-top: 2rem; height: 130px; border-bottom-left-radius: 50% 80px; border-bottom-right-radius: 50% 80px; background: linear-gradient(180deg, #0f5bd8, #0ea5a6); }
+        .hero-wave { margin-top: 2rem; height: 130px; border-bottom-left-radius: 50% 80px; border-bottom-right-radius: 50% 80px; background: linear-gradient(180deg, #38bdf8, #0ea5a6); }
         @media (min-width: 992px) { .hero { padding-top: 4.5rem; } .hero-wave { height: 160px; } }
 
         .about { padding: 4rem 0; background: linear-gradient(180deg, rgba(14,165,166,0.05), rgba(255,255,255,0)); }
@@ -148,19 +155,19 @@
         <!-- STATISTIK -->
         <section class="stats-wrap">
             <div class="container">
-                <div class="stats-bubble">
+                        <div class="stats-bubble">
                     <h4 class="text-white text-center mb-4">Jumlah Laporan Saat Ini</h4>
                     <div class="row text-center">
                         <div class="col-4">
-                            <div class="stat-number" data-countup data-target="3">0</div>
+                            <div class="stat-number" data-key="pending" data-countup data-target="{{ $pendingCount ?? 0 }}">0</div>
                             <div class="stat-label">Terkirim</div>
                         </div>
                         <div class="col-4">
-                            <div class="stat-number" data-countup data-target="10">0</div>
+                            <div class="stat-number" data-key="in_progress" data-countup data-target="{{ $inProgressCount ?? 0 }}">0</div>
                             <div class="stat-label">Dalam Proses</div>
                         </div>
                         <div class="col-4">
-                            <div class="stat-number" data-countup data-target="25">0</div>
+                            <div class="stat-number" data-key="completed" data-countup data-target="{{ $completedCount ?? 0 }}">0</div>
                             <div class="stat-label">Selesai</div>
                         </div>
                     </div>
@@ -202,10 +209,16 @@
     <script>
         const navbar = document.querySelector('.navbar');
         const backToTop = document.querySelector('.back-to-top');
+        const STATS_URL = "{{ route('public.stats') }}";
         const onScroll = () => {
             if (window.scrollY > 10) navbar.classList.add('navbar-scrolled');
             else navbar.classList.remove('navbar-scrolled');
             backToTop.style.display = window.scrollY > 240 ? 'block' : 'none';
+            const heroImg = document.querySelector('.hero-art img');
+            if (heroImg) {
+                const offset = Math.min(window.scrollY * 0.03, 18);
+                heroImg.style.transform = `translateY(${offset}px)`;
+            }
         };
         window.addEventListener('scroll', onScroll);
         onScroll();
@@ -219,7 +232,8 @@
                 const duration = 1200;
                 const frame = now => {
                     const p = Math.min((now - start) / duration, 1);
-                    el.textContent = Math.floor(p * target);
+                    const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+                    el.textContent = Math.floor(eased * target);
                     if (p < 1) requestAnimationFrame(frame);
                 };
                 requestAnimationFrame(frame);
@@ -234,6 +248,49 @@
             }, { threshold: 0.4 });
             counters.forEach(c => io.observe(c));
         }
+
+        // Live refresh with animated change
+        const counterMap = Array.from(document.querySelectorAll('.stat-number')).reduce((acc, el) => {
+            const key = el.getAttribute('data-key');
+            if (key) acc[key] = el; return acc;
+        }, {});
+
+        function animateFromTo(el, from, to, duration = 800) {
+            if (from === to) { el.textContent = to; return; }
+            const start = performance.now();
+            const frame = now => {
+                const p = Math.min((now - start) / duration, 1);
+                const eased = 1 - Math.pow(1 - p, 3);
+                const val = Math.round(from + (to - from) * eased);
+                el.textContent = val.toString();
+                if (p < 1) requestAnimationFrame(frame);
+            };
+            requestAnimationFrame(frame);
+        }
+
+        async function refreshCounts() {
+            try {
+                const res = await fetch(STATS_URL, { headers: { 'Accept': 'application/json' } });
+                if (!res.ok) return;
+                const data = await res.json();
+                const updates = {
+                    pending: Number(data.pending || 0),
+                    in_progress: Number(data.in_progress || 0),
+                    completed: Number(data.completed || 0),
+                };
+                Object.entries(updates).forEach(([key, value]) => {
+                    const el = counterMap[key];
+                    if (!el) return;
+                    const current = parseInt(el.textContent || '0', 10);
+                    if (current !== value) animateFromTo(el, current, value, 900);
+                });
+            } catch (e) { /* ignore network errors */ }
+        }
+
+        // Poll periodically for fresh counts
+        setInterval(refreshCounts, 15000);
+        // Also fetch once after initial paint to ensure up-to-date numbers
+        window.addEventListener('load', () => setTimeout(refreshCounts, 1200));
     </script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Models\FacilityReport;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FacilityReportController;
 use App\Http\Controllers\ReportCommentController;
@@ -14,8 +15,22 @@ use App\Http\Controllers\PageController; // REVISI: Backslash yang benar
 
 // Halaman utama untuk tamu (yang belum login)
 Route::get('/', function () {
-    return view('welcome');
+    $pendingCount = FacilityReport::where('status', 'pending')->count();
+    $inProgressCount = FacilityReport::where('status', 'in_progress')->count();
+    $completedCount = FacilityReport::where('status', 'completed')->count();
+
+    return view('welcome', compact('pendingCount', 'inProgressCount', 'completedCount'));
 });
+
+// Endpoint publik untuk mengambil jumlah laporan terbaru (tanpa autentikasi)
+Route::get('/public/stats', function () {
+    return response()->json([
+        'pending' => FacilityReport::where('status', 'pending')->count(),
+        'in_progress' => FacilityReport::where('status', 'in_progress')->count(),
+        'completed' => FacilityReport::where('status', 'completed')->count(),
+        'updated_at' => now()->toIso8601String(),
+    ]);
+})->name('public.stats');
 
 // Grup route yang HANYA BISA DIAKSES SETELAH LOGIN
 Route::middleware(['auth', 'verified'])->group(function () {
