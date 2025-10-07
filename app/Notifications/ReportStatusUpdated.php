@@ -24,9 +24,14 @@ class ReportStatusUpdated extends Notification
 
     public function toDatabase(object $notifiable): array
     {
+        $isCompleted = $this->report->status === 'completed';
         return [
-            'message' => 'Status laporan "' . $this->report->title . '" telah diubah menjadi ' . $this->report->status . '.',
-            'url' => route('reports.show', $this->report->report_id),
+            'message' => $isCompleted
+                ? 'Laporan "' . $this->report->title . '" telah selesai. Beri rating pengalaman Anda.'
+                : 'Status laporan "' . $this->report->title . '" telah diubah menjadi ' . $this->report->status . '.',
+            'url' => $isCompleted
+                ? route('ratings.create', $this->report->report_id)
+                : route('reports.show', $this->report->report_id),
         ];
     }
 }

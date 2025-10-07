@@ -37,6 +37,14 @@
                                 <form action="{{ route('reports.destroy',$report->report_id) }}" method="POST">
                                     <a class="btn btn-info btn-sm" href="{{ route('reports.show',$report->report_id) }}">Lihat</a>
                                     <a class="btn btn-primary btn-sm" href="{{ route('reports.edit',$report->report_id) }}">Edit</a>
+                                    @php
+                                        $alreadyRated = isset($report->ratings)
+                                            ? $report->ratings->where('user_id', Auth::id())->isNotEmpty()
+                                            : false;
+                                    @endphp
+                                    @if($report->status === 'completed' && $report->user_id === Auth::id() && !$alreadyRated)
+                                        <a class="btn btn-warning btn-sm" href="{{ route('ratings.create', $report->report_id) }}">Beri Rating</a>
+                                    @endif
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus laporan ini?')">Hapus</button>
