@@ -31,6 +31,8 @@ class ReportStatusUpdated extends Notification
         return [
             'message' => $message,
             'url' => route('reports.show', $this->report->report_id) . ($this->report->status === 'completed' ? '#beri-rating' : ''),
+            'report_id' => $this->report->report_id,
+            'status' => $this->report->status,
         ];
     }
 }

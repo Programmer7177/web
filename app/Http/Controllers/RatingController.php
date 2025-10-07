@@ -45,6 +45,14 @@ class RatingController extends Controller
             'comment' => $request->comment,
         ]);
 
+        // Tandai notifikasi terkait laporan ini sebagai sudah dibaca
+        $user = Auth::user();
+        $user->unreadNotifications()
+            ->where('type', \App\Notifications\ReportStatusUpdated::class)
+            ->where('data->report_id', $report->report_id)
+            ->get()
+            ->each(function ($n) { $n->markAsRead(); });
+
         return redirect()->route('reports.show', $report->report_id)
             ->with('success', 'Terima kasih! Rating Anda telah tersimpan.');
     }
