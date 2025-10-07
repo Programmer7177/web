@@ -44,7 +44,7 @@
                                     </form>
 
                                     @if ($report->status === 'completed' && Auth::id() === $report->user_id)
-                                        @if (($report->my_rating_count ?? 0) == 0)
+                                        @if (!in_array($report->report_id, $ratedReportIds))
                                             <a href="{{ route('reports.show', $report->report_id) }}#beri-rating" class="btn btn-warning btn-sm">Beri Rating</a>
                                         @else
                                             <span class="badge bg-success align-self-center">Sudah dirating</span>
