@@ -2,9 +2,46 @@
 
 @section('content')
 <div class="container">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="h4 fw-bold mb-0">Daftar Laporan</h2>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#filters" aria-expanded="false" aria-controls="filters">
+                <i class="bi bi-funnel"></i> Filter
+            </button>
+            <button class="btn btn-primary btn-sm" type="button" onclick="window.print()">
+                <i class="bi bi-printer"></i> Cetak
+            </button>
+        </div>
+    </div>
+    <div id="filters" class="collapse mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-3">
+                <div class="row g-2">
+                    <div class="col-12 col-md-4">
+                        <input type="text" class="form-control" placeholder="Cari judul atau deskripsi..." aria-label="Cari">
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <select class="form-select" aria-label="Filter Kategori">
+                            <option value="">Semua Kategori</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <select class="form-select" aria-label="Filter Status">
+                            <option value="">Semua Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="proses">Proses</option>
+                            <option value="selesai">Selesai</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-2 d-grid d-md-block">
+                        <button class="btn btn-primary w-100" type="button"><i class="bi bi-search"></i> Terapkan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="card border-0 shadow-sm">
         <div class="card-body">
-            <h2 class="text-center mb-4">Daftar Laporan</h2>
 
             @if ($message = Session::get('success'))
                 <div class="alert alert-success">
@@ -39,18 +76,32 @@
                             <td>{{ $report->location }}</td>
                             <td>{{ $report->created_at->format('d M Y') }}</td>
                             <td>{{ Str::limit($report->description, 30) }}</td>
-                            <td><span class="badge bg-warning text-dark">{{ Str::title(str_replace('_', ' ', $report->status)) }}</span></td>
                             <td>
-                                {{-- KUMPULKAN SEMUA TOMBOL AKSI DI SINI --}}
-                                <form action="{{ route('reports.destroy', $report->report_id) }}" method="POST" class="d-inline-flex">
-                                    <a class="btn btn-info btn-sm me-1" href="{{ route('reports.show', $report->report_id) }}">Lihat</a>
-                                    <a class="btn btn-primary btn-sm me-1" href="{{ route('reports.edit', $report->report_id) }}">Edit</a>
-                                    
-                                    {{-- TAMBAHKAN FORM HAPUS INI --}}
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus laporan ini?')">Hapus</button>
-                                </form>
+                                @php
+                                    $status = Str::of($report->status)->replace('_', ' ')->title();
+                                    $badgeClass = 'bg-secondary';
+                                    if (Str::contains(strtolower($report->status), 'pending')) $badgeClass = 'bg-warning text-dark';
+                                    elseif (Str::contains(strtolower($report->status), 'proses')) $badgeClass = 'bg-info text-dark';
+                                    elseif (Str::contains(strtolower($report->status), 'selesai')) $badgeClass = 'bg-success';
+                                @endphp
+                                <span class="badge {{ $badgeClass }}">{{ $status }}</span>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group" aria-label="Aksi Laporan">
+                                    <a class="btn btn-outline-secondary btn-sm" href="{{ route('reports.show', $report->report_id) }}" data-bs-toggle="tooltip" data-bs-title="Lihat Detail">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a class="btn btn-outline-primary btn-sm" href="{{ route('reports.edit', $report->report_id) }}" data-bs-toggle="tooltip" data-bs-title="Edit Laporan">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form action="{{ route('reports.destroy', $report->report_id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus laporan ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" data-bs-toggle="tooltip" data-bs-title="Hapus Laporan">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                         @empty
