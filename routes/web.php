@@ -22,6 +22,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // Route untuk dashboard pengguna
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/export', [DashboardController::class, 'export'])->name('dashboard.export');
 
     // Route untuk semua proses CRUD Laporan Fasilitas
     Route::resource('reports', FacilityReportController::class);
