@@ -6,6 +6,20 @@
     <title>Lapor UNAIR — Pelaporan Masalah Kampus</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://unpkg.com/aos@next/dist/aos.css" rel="stylesheet">
+    <script>
+        (function() {
+            try {
+                if ('scrollRestoration' in history) {
+                    history.scrollRestoration = 'manual';
+                }
+                // Cegah auto-scroll ke #login-section saat pertama kali membuka halaman
+                if (window.location.hash === '#login-section') {
+                    history.replaceState(null, document.title, window.location.pathname + window.location.search);
+                    window.scrollTo(0, 0);
+                }
+            } catch (e) {}
+        })();
+    </script>
 
     <style>
         html { scroll-behavior: smooth; }
@@ -291,6 +305,18 @@
 
     <button class="back-to-top" aria-label="Kembali ke atas">▲</button>
 
+    <!-- Scroll Popup (Toast) -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1080">
+        <div id="scrollToast" class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="6000">
+            <div class="d-flex">
+                <div class="toast-body">
+                    Ada kendala di kampus? Buat laporan sekarang agar cepat ditangani.
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>
@@ -363,27 +389,24 @@
                 counters.forEach(el => obs.observe(el));
             }
 
-            // FAQ live search
-            const faqAccordion = document.getElementById('faqAccordion');
-            const searchBar = document.createElement('div');
-            searchBar.className = 'input-group mb-3';
-            searchBar.innerHTML = `
-                <span class="input-group-text bg-white"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242 1.106a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/></svg></span>
-                <input id="faqSearchInput" type="search" class="form-control" placeholder="Cari pertanyaan... (mis. status, laporan, unit)">
-            `;
-            const faqSectionTitle = document.querySelector('#faq .section-title');
-            if (faqSectionTitle && faqAccordion) {
-                faqSectionTitle.insertAdjacentElement('afterend', searchBar);
-                const input = document.getElementById('faqSearchInput');
-                input.addEventListener('input', function () {
-                    const term = this.value.toLowerCase().trim();
-                    const items = faqAccordion.querySelectorAll('.accordion-item');
-                    items.forEach(item => {
-                        const text = item.textContent.toLowerCase();
-                        item.style.display = text.includes(term) ? '' : 'none';
-                    });
-                });
-            }
+            // Popup saat scroll (muncul sekali per sesi ketika sudah scroll cukup jauh)
+            try {
+                const toastEl = document.getElementById('scrollToast');
+                if (toastEl && window.bootstrap) {
+                    let popupShown = sessionStorage.getItem('scrollToastShown') === '1';
+                    const onScrollToast = function () {
+                        if (popupShown) return;
+                        if (window.scrollY > 500) {
+                            const toast = window.bootstrap.Toast.getOrCreateInstance(toastEl);
+                            toast.show();
+                            popupShown = true;
+                            sessionStorage.setItem('scrollToastShown', '1');
+                            window.removeEventListener('scroll', onScrollToast);
+                        }
+                    };
+                    window.addEventListener('scroll', onScrollToast, { passive: true });
+                }
+            } catch (e) {}
         });
     </script>
 </body>
