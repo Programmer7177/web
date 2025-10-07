@@ -18,13 +18,8 @@ class FacilityReportController extends Controller
     public function index()
     {
         if (Auth::user()->role->name == 'admin_sarpras') {
-            $reports = FacilityReport::withCount([
-                                        'ratings as my_rating_count' => function ($q) {
-                                            $q->where('user_id', Auth::id());
-                                        },
-                                    ])
-                                    ->latest()
-                                    ->paginate(10);
+            // Admin tidak memerlukan informasi rating milik dirinya
+            $reports = FacilityReport::latest()->paginate(10);
         } else {
             $reports = FacilityReport::where('user_id', Auth::id())
                                      ->withCount([
@@ -97,8 +92,11 @@ class FacilityReportController extends Controller
                 $notification->markAsRead();
             }
         }
-        // Ambil rating user saat ini (jika ada)
-        $userRating = $report->ratings()->where('user_id', Auth::id())->first();
+        // Ambil rating user saat ini (jika ada) hanya untuk pelapor
+        $userRating = null;
+        if (Auth::id() === $report->user_id) {
+            $userRating = $report->ratings()->where('user_id', Auth::id())->first();
+        }
         return view('reports.show', compact('report', 'userRating'));
     }
 
