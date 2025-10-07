@@ -9,7 +9,11 @@
 
     <style>
         html { scroll-behavior: smooth; }
-        body { background: #f7f9fc; }
+        /* Sky-blue fresh gradient background */
+        body {
+            background: radial-gradient(1200px 500px at 20% 0%, rgba(255,255,255,.9), rgba(255,255,255,.6) 40%, rgba(14,165,233,.08) 70%),
+                        linear-gradient(180deg, #e0f2fe 0%, #f0f9ff 35%, #e6f4ff 100%);
+        }
 
         .navbar-brand img { height: 40px; }
         .navbar-scrolled { backdrop-filter: saturate(180%) blur(8px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
@@ -29,7 +33,7 @@
         .hero-section::before {
             content: "";
             position: absolute; inset: 0;
-            background: linear-gradient(135deg, rgba(16, 85, 197, 0.75), rgba(16, 200, 157, 0.65));
+            background: linear-gradient(135deg, rgba(59,130,246,0.80), rgba(14,165,233,0.70));
         }
         .hero-content { position: relative; z-index: 1; }
         .hero-title { font-weight: 800; letter-spacing: 0.5px; }
@@ -211,15 +215,15 @@
                 <h3 class="mb-4">Jumlah Laporan Saat Ini</h3>
                 <div class="row g-4">
                     <div class="col-4">
-                        <div class="counter-value" data-countup data-target="3">0</div>
+                        <div class="counter-value" data-key="pending" data-countup data-target="{{ $pendingCount ?? 0 }}">0</div>
                         <p class="mb-0">Terkirim</p>
                     </div>
                     <div class="col-4">
-                        <div class="counter-value" data-countup data-target="10">0</div>
+                        <div class="counter-value" data-key="in_progress" data-countup data-target="{{ $inProgressCount ?? 0 }}">0</div>
                         <p class="mb-0">Dalam Proses</p>
                     </div>
                     <div class="col-4">
-                        <div class="counter-value" data-countup data-target="25">0</div>
+                        <div class="counter-value" data-key="completed" data-countup data-target="{{ $completedCount ?? 0 }}">0</div>
                         <p class="mb-0">Selesai</p>
                     </div>
                 </div>
@@ -344,7 +348,8 @@
                     const startTime = performance.now();
                     const step = function (now) {
                         const progress = Math.min((now - startTime) / duration, 1);
-                        const value = Math.floor(progress * target);
+                        const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+                        const value = Math.floor(eased * target);
                         el.textContent = value.toString();
                         if (progress < 1) requestAnimationFrame(step);
                     };
@@ -384,6 +389,39 @@
                     });
                 });
             }
+
+            // Live refresh counts (polling)
+            const STATS_URL = "{{ route('public.stats') }}";
+            const map = Array.from(document.querySelectorAll('.counter-value')).reduce((acc, el) => {
+                const key = el.getAttribute('data-key');
+                if (key) acc[key] = el; return acc;
+            }, {});
+            function animateFromTo(el, from, to, duration = 900) {
+                if (from === to) { el.textContent = to; return; }
+                const start = performance.now();
+                const step = function (now) {
+                    const p = Math.min((now - start) / duration, 1);
+                    const eased = 1 - Math.pow(1 - p, 3);
+                    el.textContent = Math.round(from + (to - from) * eased);
+                    if (p < 1) requestAnimationFrame(step);
+                };
+                requestAnimationFrame(step);
+            }
+            async function refreshCounts() {
+                try {
+                    const res = await fetch(STATS_URL, { headers: { 'Accept': 'application/json' } });
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    const updates = { pending: +data.pending || 0, in_progress: +data.in_progress || 0, completed: +data.completed || 0 };
+                    Object.entries(updates).forEach(([k, v]) => {
+                        const el = map[k]; if (!el) return;
+                        const cur = parseInt(el.textContent || '0', 10);
+                        if (cur !== v) animateFromTo(el, cur, v);
+                    });
+                } catch {}
+            }
+            setInterval(refreshCounts, 15000);
+            setTimeout(refreshCounts, 1200);
         });
     </script>
 </body>
