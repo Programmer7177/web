@@ -22,8 +22,14 @@ class DashboardController extends Controller
             $categoryId = $request->integer('category_id') ?: null;
             $status = $request->string('status')->toString();
 
+            // Dapatkan instansi_id dari admin yang sedang login
+            $adminInstansiId = Auth::user()->instansi_id;
+
             // Query dasar dengan relasi untuk menghindari N+1
-            $query = FacilityReport::with(['reporter', 'category', 'instansi'])->latest();
+            // Filter berdasarkan instansi admin
+            $query = FacilityReport::with(['reporter', 'category', 'instansi'])
+                ->where('instansi_id', $adminInstansiId)
+                ->latest();
 
             // Terapkan filter opsional
             if (!empty($search)) {
@@ -42,12 +48,12 @@ class DashboardController extends Controller
 
             $reports = $query->paginate(10)->withQueryString();
 
-            // Data metrik ringkas
+            // Data metrik ringkas - hanya untuk instansi admin
             $metrics = [
-                'total' => FacilityReport::count(),
-                'pending' => FacilityReport::where('status', 'pending')->count(),
-                'in_progress' => FacilityReport::where('status', 'in_progress')->count(),
-                'completed' => FacilityReport::where('status', 'completed')->count(),
+                'total' => FacilityReport::where('instansi_id', $adminInstansiId)->count(),
+                'pending' => FacilityReport::where('instansi_id', $adminInstansiId)->where('status', 'pending')->count(),
+                'in_progress' => FacilityReport::where('instansi_id', $adminInstansiId)->where('status', 'in_progress')->count(),
+                'completed' => FacilityReport::where('instansi_id', $adminInstansiId)->where('status', 'completed')->count(),
             ];
 
             // Data referensi filter
@@ -116,7 +122,12 @@ class DashboardController extends Controller
         $categoryId = $request->integer('category_id') ?: null;
         $status = $request->string('status')->toString();
 
-        $query = FacilityReport::with(['reporter', 'category', 'instansi'])->latest();
+        // Dapatkan instansi_id dari admin yang sedang login
+        $adminInstansiId = Auth::user()->instansi_id;
+
+        $query = FacilityReport::with(['reporter', 'category', 'instansi'])
+            ->where('instansi_id', $adminInstansiId)
+            ->latest();
 
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
