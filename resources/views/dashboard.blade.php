@@ -141,15 +141,26 @@
     }
 
     /* Bound chart areas to prevent layout expansion */
-    .chart-container {
+    .chart-container,
+    .chart-doughnut-container {
         position: relative;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+    }
+    .chart-container {
         height: 320px;
         max-height: 60vh;
     }
     .chart-doughnut-container {
-        position: relative;
         height: 240px;
         max-height: 50vh;
+    }
+    .chart-container canvas,
+    .chart-doughnut-container canvas {
+        display: block;
+        width: 100% !important;
+        height: 100% !important;
     }
 </style>
 @endpush
@@ -358,7 +369,9 @@ document.addEventListener('DOMContentLoaded', function () {
         scales: {
           y: { beginAtZero: true, ticks: { precision:0 } }
         },
-        plugins: { legend: { display: false } }
+        plugins: { legend: { display: false } },
+        animation: false,
+        resizeDelay: 200
       }
     });
   }
@@ -380,7 +393,9 @@ document.addEventListener('DOMContentLoaded', function () {
         plugins: { legend: { display: false } },
         cutout: '60%',
         responsive: true,
-        maintainAspectRatio: false
+        maintainAspectRatio: false,
+        animation: false,
+        resizeDelay: 200
       }
     });
   }
