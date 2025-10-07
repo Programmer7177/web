@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\FacilityReport;
 use App\Models\Category;
 use App\Models\Instansi;
+use App\Models\Rating;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -19,12 +20,16 @@ class FacilityReportController extends Controller
     {
         if (Auth::user()->role->name == 'admin_sarpras') {
             $reports = FacilityReport::latest()->paginate(10);
+            $ratedReportIds = [];
         } else {
             $reports = FacilityReport::where('user_id', Auth::id())
                                      ->latest()
                                      ->paginate(10);
+            $ratedReportIds = Rating::where('user_id', Auth::id())
+                                    ->pluck('report_id')
+                                    ->all();
         }
-        return view('reports.index', compact('reports'));
+        return view('reports.index', compact('reports', 'ratedReportIds'));
     }
 
     /**
@@ -86,7 +91,14 @@ class FacilityReportController extends Controller
                 $notification->markAsRead();
             }
         }
-        return view('reports.show', compact('report'));
+        // Ambil rating user saat ini (jika ada) hanya untuk pelapor tanpa mengandalkan relasi
+        $userRating = null;
+        if (Auth::id() === $report->user_id) {
+            $userRating = Rating::where('report_id', $report->report_id)
+                                ->where('user_id', Auth::id())
+                                ->first();
+        }
+        return view('reports.show', compact('report', 'userRating'));
     }
 
     /**

@@ -43,8 +43,15 @@
                             <li><hr class="dropdown-divider"></li>
                             @if(isset($notifications))
                                 @forelse($notifications as $notification)
+                                    @php
+                                        $rawUrl = $notification->data['url'] ?? '#';
+                                        $urlParts = explode('#', $rawUrl, 2);
+                                        $baseUrl = $urlParts[0];
+                                        $fragment = $urlParts[1] ?? null;
+                                        $href = $baseUrl . (str_contains($baseUrl, '?') ? '&' : '?') . 'notify_id=' . $notification->id . ($fragment ? '#' . $fragment : '');
+                                    @endphp
                                     <li>
-                                        <a class="dropdown-item" href="{{ $notification->data['url'] }}?notify_id={{ $notification->id }}" style="white-space: normal;">
+                                        <a class="dropdown-item" href="{{ $href }}" style="white-space: normal;">
                                             <p class="mb-0 small">{{ $notification->data['message'] }}</p>
                                             <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
                                         </a>

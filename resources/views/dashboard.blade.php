@@ -134,7 +134,17 @@
             transform: none;
         }
     }
-
+    /* Full-bleed footer strip */
+    .footer-strip {
+        margin-top: 4rem;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        background-color: #0B4A8B;
+        color: #ffffff;
+        text-align: center;
+        padding: 18px 16px;
+    }
+    
     .chart-container,
     .chart-doughnut-container {
         position: relative;
@@ -196,7 +206,7 @@
     <div class="stats-card">
         <h3 class="mb-4">Jumlah Laporan Saat Ini</h3>
         <div class="row justify-content-center">
-            <div class="col-md-3 col-6 mb-3"><h1 class="stat-number" data-countup data-target="{{ $pendingCount }}">0</h1><p>Terkirim</p></div>
+            <div class="col-md-3 col-6 mb-3"><h1 class="stat-number" data-countup data-target="{{ $pendingCount }}">0</h1><p>Baru Masuk</p></div>
             <div class="col-md-3 col-6 mb-3"><h1 class="stat-number" data-countup data-target="{{ $inProgressCount }}">0</h1><p>Dalam Proses</p></div>
             <div class="col-md-3 col-6 mb-3"><h1 class="stat-number" data-countup data-target="{{ $completedCount }}">0</h1><p>Selesai</p></div>
         </div>
@@ -225,11 +235,16 @@
                         <canvas id="statusDoughnutChart"></canvas>
                     </div>
                     <div class="mt-3 d-flex flex-column gap-1">
-                        <div class="d-flex justify-content-between"><span class="badge bg-secondary">Terkirim</span><span>{{ $statusCounts['pending'] ?? $pendingCount }}</span></div>
+                        <div class="d-flex justify-content-between"><span class="badge bg-secondary">Baru Masuk</span><span>{{ $statusCounts['pending'] ?? $pendingCount }}</span></div>
                         <div class="d-flex justify-content-between"><span class="badge bg-info text-dark">Dalam Proses</span><span>{{ $statusCounts['in_progress'] ?? $inProgressCount }}</span></div>
                         <div class="d-flex justify-content-between"><span class="badge bg-success">Selesai</span><span>{{ $statusCounts['completed'] ?? $completedCount }}</span></div>
                     </div>
                 </div>
+            </div>
+        </div>
+        {{-- Footer strip --}}
+            <div class="footer-strip">
+                © 2025 LaporUnair. All Rights Reserved.
             </div>
         </div>
     </div>
@@ -307,7 +322,7 @@ document.addEventListener('DOMContentLoaded', function () {
     new Chart(doughnutCtx, {
       type: 'doughnut',
       data: {
-        labels: ['Terkirim', 'Dalam Proses', 'Selesai'],
+        labels: ['Baru Masuk', 'Dalam Proses', 'Selesai'],
         datasets: [{
           data: values,
           backgroundColor: ['#ffc107', '#0dcaf0', '#198754'],
