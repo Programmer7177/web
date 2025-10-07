@@ -8,6 +8,11 @@
             <a class="btn btn-secondary" href="{{ (Auth::user()->role->name == 'admin_sarpras') ? route('dashboard') : route('reports.index') }}"> Kembali</a>
         </div>
         <div class="card-body">
+            @if ($message = Session::get('success'))
+                <div class="alert alert-success">
+                    <p class="mb-0">{{ $message }}</p>
+                </div>
+            @endif
             <div class="row">
                 <div class="col-md-8">
                     <h3 class="card-title mb-3">{{ $report->title }}</h3>
@@ -15,9 +20,23 @@
                 </div>
                 <div class="col-md-4">
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between">
-                            <strong>Status:</strong>
-                            <span class="badge bg-warning text-dark">{{ Str::title(str_replace('_', ' ', $report->status)) }}</span>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Status:</strong>
+                                <span class="badge bg-warning text-dark">{{ Str::title(str_replace('_', ' ', $report->status)) }}</span>
+                            </div>
+                            @php
+                                $alreadyRated = isset($report->ratings)
+                                    ? $report->ratings->where('user_id', Auth::id())->isNotEmpty()
+                                    : false;
+                            @endphp
+                            @if($report->status === 'completed' && $report->user_id === Auth::id())
+                                @if(!$alreadyRated)
+                                    <a class="btn btn-sm btn-warning" href="{{ route('ratings.create', $report->report_id) }}">Beri Rating</a>
+                                @else
+                                    <span class="text-muted small">Anda sudah memberi rating</span>
+                                @endif
+                            @endif
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
                             <strong>Kategori:</strong>

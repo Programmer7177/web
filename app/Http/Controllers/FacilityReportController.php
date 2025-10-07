@@ -18,9 +18,12 @@ class FacilityReportController extends Controller
     public function index()
     {
         if (Auth::user()->role->name == 'admin_sarpras') {
-            $reports = FacilityReport::latest()->paginate(10);
+            $reports = FacilityReport::with('ratings')
+                                     ->latest()
+                                     ->paginate(10);
         } else {
-            $reports = FacilityReport::where('user_id', Auth::id())
+            $reports = FacilityReport::with('ratings')
+                                     ->where('user_id', Auth::id())
                                      ->latest()
                                      ->paginate(10);
         }
@@ -86,6 +89,7 @@ class FacilityReportController extends Controller
                 $notification->markAsRead();
             }
         }
+        $report->load('ratings');
         return view('reports.show', compact('report'));
     }
 
