@@ -134,17 +134,8 @@
             transform: none;
         }
     }
-    /* Full-bleed footer strip */
-    .footer-strip {
-        margin-top: 4rem;
-        margin-left: calc(-50vw + 50%);
-        margin-right: calc(-50vw + 50%);
-        background-color: #0B4A8B;
-        color: #ffffff;
-        text-align: center;
-        padding: 18px 16px;
-    }
-    
+
+    /* Bound chart areas to prevent layout expansion */
     .chart-container,
     .chart-doughnut-container {
         position: relative;
@@ -308,7 +299,9 @@ document.addEventListener('DOMContentLoaded', function () {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        scales: { y: { beginAtZero: true, ticks: { precision:0 } } },
+        scales: {
+          y: { beginAtZero: true, ticks: { precision:0 } }
+        },
         plugins: { legend: { display: false } },
         animation: false,
         resizeDelay: 200
