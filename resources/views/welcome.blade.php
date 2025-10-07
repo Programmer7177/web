@@ -6,9 +6,24 @@
     <title>Lapor UNAIR — Pelaporan Masalah Kampus</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://unpkg.com/aos@next/dist/aos.css" rel="stylesheet">
+    <script>
+        (function() {
+            try {
+                if ('scrollRestoration' in history) {
+                    history.scrollRestoration = 'manual';
+                }
+                // Hentikan loncatan awal ke #login-section saat halaman pertama kali dimuat
+                if (window.location.hash === '#login-section') {
+                    history.replaceState(null, document.title, window.location.pathname + window.location.search);
+                    window.scrollTo(0, 0);
+                }
+            } catch (e) {}
+        })();
+    </script>
 
     <style>
-        html { scroll-behavior: smooth; }
+        /* Nonaktifkan smooth scroll agar tidak auto scroll */
+        html { scroll-behavior: auto; }
         body { background: #f7f9fc; }
 
         .navbar-brand img { height: 40px; }
@@ -270,7 +285,7 @@
                         @csrf
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input id="email" class="form-control" type="email" name="email" :value="old('email')" required autofocus>
+                            <input id="email" class="form-control" type="email" name="email" :value="old('email')" required>
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
@@ -300,17 +315,7 @@
                 AOS.init({ once: true, duration: 650, easing: 'ease-out-quart' });
             }
 
-            // Smooth scroll for on-page links
-            document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
-                anchor.addEventListener('click', function (e) {
-                    const targetId = this.getAttribute('href');
-                    if (targetId && targetId.length > 1) {
-                        e.preventDefault();
-                        const el = document.querySelector(targetId);
-                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                });
-            });
+            // Smooth scroll dihapus agar tidak terjadi auto scroll
 
             // Navbar shadow on scroll
             const navbar = document.querySelector('.navbar');

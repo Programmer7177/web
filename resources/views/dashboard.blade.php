@@ -14,15 +14,15 @@
     }
 
     .hero-section {
-        background-image: url('{{ asset('images/image_main.png') }}'); /* Ganti dengan gambar hero yang besar */
+        background-image: url('{{ asset('images/image_main.png') }}');
         background-size: cover;
         background-position: center;
-        padding: 8rem 1.5rem; /* Padding lebih besar untuk memperbesar ke bawah */
+        padding: 8rem 1.5rem;
         border-radius: 0.5rem;
         color: white;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
         margin-bottom: 3rem;
-        position: relative; /* Untuk menempatkan logo LaporUnair di atas gambar */
+        position: relative;
     }
     .hero-title-container {
         position: absolute;
@@ -30,10 +30,10 @@
         left: 50%;
         transform: translate(-50%, -50%);
         text-align: center;
-        width: 80%; /* Batasi lebar container judul */
+        width: 80%;
     }
     .hero-title-container img {
-        height: 60px; /* Ukuran logo LaporUnair di hero */
+        height: 60px;
         margin-bottom: 10px;
     }
     .hero-title-container h2 {
@@ -46,7 +46,7 @@
         margin-bottom: 5rem;
     }
     .description-section p.lead {
-        line-height: 1.8; /* Rapatkan baris teks */
+        line-height: 1.8;
         margin-bottom: 2rem;
     }
     .image-card {
@@ -54,8 +54,8 @@
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         width: 100%;
         height: auto;
-        max-width: 350px; /* Batasi ukuran gambar gerbang */
-        margin: 0 auto; /* Tengah gambar */
+        max-width: 350px;
+        margin: 0 auto;
     }
 
     .flow-section {
@@ -67,18 +67,14 @@
         top: 50px; 
         right: 50%;
         width: 100%;
-    
-        /* REVISI DI SINI */
-        height: 10px; /* Sesuaikan dengan tinggi gambar garis Anda */
+        height: 10px;
         background-image: url('{{ asset('images/garis.png') }}');
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
-    
-        /*z-index: -1;*/
     }
     .flow-card img {
-        max-height: 90px; /* Ukuran ikon alur */
+        max-height: 90px;
         margin-bottom: 1rem;
     }
     .flow-card h4 {
@@ -87,16 +83,16 @@
     }
 
     .stats-card {
-        background-image: url('{{ asset('images/Union.png') }}'); /* Gambar background untuk statistik */
+        background-image: url('{{ asset('images/Union.png') }}');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
         color: white;
-        padding: 5rem 2rem; /* Padding lebih besar */
+        padding: 5rem 2rem;
         text-align: center;
         border-radius: 1rem;
         box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-        margin-bottom: 5rem; /* Memberi jarak ke footer */
+        margin-bottom: 5rem;
     }
     .stats-card h3 {
         font-size: 2rem;
@@ -104,7 +100,7 @@
         margin-bottom: 2rem;
     }
     .stats-card h1 {
-        font-size: 4.5rem; /* Ukuran angka lebih besar */
+        font-size: 4.5rem;
         font-weight: bolder;
         margin-bottom: 0.5rem;
     }
@@ -113,7 +109,6 @@
         margin-bottom: 0;
     }
 
-    /* Responsif untuk layar kecil */
     @media (max-width: 768px) {
         .hero-section {
             padding: 5rem 1rem;
@@ -125,19 +120,41 @@
             font-size: 1.2rem;
         }
         body {
-            background: #f0f2f5; /* Nonaktifkan gradasi di mobile jika tidak cocok */
+            background: #f0f2f5;
         }
         .intro-image-right-wrapper {
-            position: relative; /* Ubah ke relatif di mobile */
+            position: relative;
             text-align: center;
             margin-top: 2rem;
         }
         .intro-megaphone-img {
-            position: static; /* Hilangkan posisi absolut di mobile */
+            position: static;
             width: 70px;
             margin-top: 1rem;
             transform: none;
         }
+    }
+
+    .chart-container,
+    .chart-doughnut-container {
+        position: relative;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+    }
+    .chart-container {
+        height: 320px;
+        max-height: 60vh;
+    }
+    .chart-doughnut-container {
+        height: 240px;
+        max-height: 50vh;
+    }
+    .chart-container canvas,
+    .chart-doughnut-container canvas {
+        display: block;
+        width: 100% !important;
+        height: 100% !important;
     }
 </style>
 @endpush
@@ -158,7 +175,7 @@
                 <img src="{{ asset('images/image.png') }}" class="img-fluid image-card" alt="Gerbang UNAIR">
             </div>
             <div class="col-md-8 px-4">
-                <p class="lead text-dark">LaporUnair adalah layanan digital Universitas Airlangga untuk mempermudah civitas akademika dalam melaporkan berbagai kendala di kampus, mulai dari kerusakan sarana-prasarana, kendala persuratan, hingga keluhan akademik. Sistem ini memastikan laporan tersampaikan langsung ke unit kerja terkait, dapat dipantau statusnya secara real-time, serta ditangani dengan lebih cepat dan transparan.</p>
+                <p class="lead text-dark">LaporUnair adalah layanan digital Universitas Airlangga untuk mempermudah civitas akademika dalam melaporkan berbagai kendala di kampus...</p>
                 <a href="{{ route('reports.create') }}" class="btn btn-primary btn-lg rounded-pill px-4 py-2">Buat Laporan Baru</a>
             </div>
         </div>
@@ -168,34 +185,14 @@
     <div class="flow-section">
         <h2 class="text-center mb-5 fw-bold">Alur Pelaporan</h2>
         <div class="row text-center justify-content-center">
-            <div class="col-md-3">
-                <div class="flow-card">
-                    <img src="{{ asset('images/padi (7) 1.png') }}" alt="Kirim Laporan" class="img-fluid mb-3">
-                    <h4>Kirim Laporan</h4>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="flow-card">
-                    <img src="{{ asset('images/padi (6) 1.png') }}" alt="Laporan Diproses" class="img-fluid mb-3">
-                    <h4>Laporan Diproses</h4>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="flow-card">
-                    <img src="{{ asset('images/padi (5) 1.png') }}" alt="Masalah Selesai" class="img-fluid mb-3">
-                    <h4>Masalah Selesai</h4>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="flow-card">
-                    <img src="{{ asset('images/padi (4) 1.png') }}" alt="Nilai Pelayanan" class="img-fluid mb-3">
-                    <h4>Nilai Pelayanan</h4>
-                </div>
-            </div>
+            <div class="col-md-3"><div class="flow-card"><img src="{{ asset('images/padi (7) 1.png') }}" alt="Kirim Laporan" class="img-fluid mb-3"><h4>Kirim Laporan</h4></div></div>
+            <div class="col-md-3"><div class="flow-card"><img src="{{ asset('images/padi (6) 1.png') }}" alt="Laporan Diproses" class="img-fluid mb-3"><h4>Laporan Diproses</h4></div></div>
+            <div class="col-md-3"><div class="flow-card"><img src="{{ asset('images/padi (5) 1.png') }}" alt="Masalah Selesai" class="img-fluid mb-3"><h4>Masalah Selesai</h4></div></div>
+            <div class="col-md-3"><div class="flow-card"><img src="{{ asset('images/padi (4) 1.png') }}" alt="Nilai Pelayanan" class="img-fluid mb-3"><h4>Nilai Pelayanan</h4></div></div>
         </div>
     </div>
 
-    {{-- Bagian Statistik Laporan --}}
+    {{-- Bagian Statistik --}}
     <div class="stats-card">
         <h3 class="mb-4">Jumlah Laporan Saat Ini</h3>
         <div class="row justify-content-center">
@@ -205,24 +202,28 @@
         </div>
     </div>
 
-    {{-- Widget Interaktif: Tren 7 Hari & Distribusi Status --}}
+    {{-- Chart --}}
     <div class="row g-4 mb-5">
         <div class="col-lg-8">
-            <div class="card border-0 shadow-sm h-100">
+            <div class="card border-0 shadow-sm">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="mb-0">Tren Laporan 7 Hari Terakhir</h5>
                         <span class="text-muted small">Semua laporan</span>
                     </div>
-                    <canvas id="reportsTrendChart" height="120"></canvas>
+                    <div class="chart-container">
+                        <canvas id="reportsTrendChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-lg-4">
-            <div class="card border-0 shadow-sm h-100">
+            <div class="card border-0 shadow-sm">
                 <div class="card-body">
                     <h5 class="mb-3">Distribusi Status</h5>
-                    <canvas id="statusDoughnutChart" height="200"></canvas>
+                    <div class="chart-doughnut-container">
+                        <canvas id="statusDoughnutChart"></canvas>
+                    </div>
                     <div class="mt-3 d-flex flex-column gap-1">
                         <div class="d-flex justify-content-between"><span class="badge bg-secondary">Terkirim</span><span>{{ $statusCounts['pending'] ?? $pendingCount }}</span></div>
                         <div class="d-flex justify-content-between"><span class="badge bg-info text-dark">Dalam Proses</span><span>{{ $statusCounts['in_progress'] ?? $inProgressCount }}</span></div>
@@ -232,64 +233,17 @@
             </div>
         </div>
     </div>
-
-    {{-- Laporan Terbaru --}}
-    <div class="card border-0 shadow-sm mb-5">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">Laporan Terbaru Anda</h5>
-                <a href="{{ route('reports.index') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
-            </div>
-            @if(isset($latestReports) && $latestReports->count())
-                <div class="table-responsive">
-                    <table class="table align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Judul</th>
-                                <th>Kategori</th>
-                                <th>Lokasi</th>
-                                <th>Status</th>
-                                <th>Tanggal</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($latestReports as $report)
-                                <tr>
-                                    <td>{{ Str::limit($report->title, 40) }}</td>
-                                    <td>{{ $report->category->name ?? '-' }}</td>
-                                    <td>{{ Str::limit($report->location, 24) }}</td>
-                                    <td>
-                                        @php
-                                            $badgeClass = match($report->status) {
-                                                'completed' => 'bg-success',
-                                                'in_progress' => 'bg-info text-dark',
-                                                'pending' => 'bg-warning text-dark',
-                                                default => 'bg-secondary',
-                                            };
-                                        @endphp
-                                        <span class="badge {{ $badgeClass }}">{{ Str::title(str_replace('_', ' ', $report->status)) }}</span>
-                                    </td>
-                                    <td>{{ $report->created_at->format('d M Y') }}</td>
-                                    <td>
-                                        <a href="{{ route('reports.show', $report->report_id) }}" class="btn btn-sm btn-outline-secondary">Lihat</a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @else
-                <p class="text-muted mb-0">Belum ada laporan terbaru.</p>
-            @endif
-        </div>
-    </div>
 @endsection
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+  // 🔒 Cegah browser restore posisi scroll otomatis
+  if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+  }
+
   const counters = document.querySelectorAll('[data-countup]');
   if (counters.length) {
     const animateCounter = function (el, target) {
@@ -339,10 +293,10 @@ document.addEventListener('DOMContentLoaded', function () {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        scales: {
-          y: { beginAtZero: true, ticks: { precision:0 } }
-        },
-        plugins: { legend: { display: false } }
+        scales: { y: { beginAtZero: true, ticks: { precision:0 } } },
+        plugins: { legend: { display: false } },
+        animation: false,
+        resizeDelay: 200
       }
     });
   }
@@ -362,10 +316,19 @@ document.addEventListener('DOMContentLoaded', function () {
       },
       options: {
         plugins: { legend: { display: false } },
-        cutout: '60%'
+        cutout: '60%',
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        resizeDelay: 200
       }
     });
   }
+});
+
+// 🔝 Paksa posisi halaman tetap di atas saat load
+window.addEventListener('load', function() {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
 });
 </script>
 @endpush
