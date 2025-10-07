@@ -55,6 +55,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // ℹ️ Halaman tentang layanan
     Route::get('/tentang-layanan', [PageController::class, 'about'])->name('pages.about');
+    
+    // 🧪 Test star rating component
+    Route::get('/test-star', function () {
+        return view('test-star');
+    })->name('test.star');
 });
 
 // 🔐 Route untuk login, register, lupa password, dll (Breeze)
