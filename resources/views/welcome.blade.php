@@ -8,7 +8,8 @@
     <link href="https://unpkg.com/aos@next/dist/aos.css" rel="stylesheet">
 
     <style>
-        html { scroll-behavior: smooth; }
+        /* Nonaktifkan smooth scroll agar tidak auto scroll */
+        html { scroll-behavior: auto; }
         body { background: #f7f9fc; }
 
         .navbar-brand img { height: 40px; }
@@ -300,17 +301,7 @@
                 AOS.init({ once: true, duration: 650, easing: 'ease-out-quart' });
             }
 
-            // Smooth scroll for on-page links
-            document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
-                anchor.addEventListener('click', function (e) {
-                    const targetId = this.getAttribute('href');
-                    if (targetId && targetId.length > 1) {
-                        e.preventDefault();
-                        const el = document.querySelector(targetId);
-                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                });
-            });
+            // Smooth scroll dihapus agar tidak terjadi auto scroll
 
             // Navbar shadow on scroll
             const navbar = document.querySelector('.navbar');
