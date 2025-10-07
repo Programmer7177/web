@@ -5,24 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Lapor Unair</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     @stack('styles')
 </head>
-<body style="background-color: #f8f9fa;">
+<body data-bs-theme="light">
     
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm border-bottom sticky-top py-2">
         <div class="container">
             <a class="navbar-brand" href="{{ route('dashboard') }}">
                 <img src="{{ asset('images/logo laporunair.png') }}" alt="Lapor Unair Logo" height="40">
             </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
-                    <li class="nav-item"><a class="nav-link" href="{{ route('dashboard') }}">Daftar Laporan</a></li>
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="{{ route('dashboard') }}">Daftar Laporan</a></li>
                 </ul>
                 <div class="d-flex align-items-center">
 
                     <div class="dropdown me-3">
-                        <a href="#" class="text-secondary position-relative fs-4 text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false">
-                            🔔
+                        <a href="#" class="text-secondary position-relative fs-5 text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifikasi">
+                            <i class="bi bi-bell"></i>
                             @if(isset($notifications) && $notifications->count() > 0)
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6em;">
                                     {{ $notifications->count() }}
@@ -79,23 +86,80 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Enable tooltips globally
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        const tooltipList = [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el));
+    </script>
 </body>
 </html>
 
 <style>
-    /* 1. REVISI GRADASI WARNA */
+    :root {
+        --bs-primary: #6366f1; /* indigo-500 */
+        --bs-primary-rgb: 99, 102, 241;
+        --bs-link-color: #4f46e5; /* indigo-600 */
+        --bs-link-hover-color: #4338ca; /* indigo-700 */
+    }
+
     body {
-        /* Warna dasar yang netral */
-        background-color: #f8f9fa;
-        /* Dua sumber cahaya radial yang menyebar dengan lembut */
-        background-image: 
-            radial-gradient(circle at top left, rgba(255, 221, 114, 0.2), transparent 100%),
-            radial-gradient(circle at bottom right, rgba(144, 202, 249, 0.3), transparent 100%);
+        font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+        color: #0f172a; /* slate-900 */
+        background-image:
+            radial-gradient(circle at 0% 0%, rgba(255, 221, 114, 0.18), transparent 55%),
+            radial-gradient(circle at 100% 100%, rgba(144, 202, 249, 0.25), transparent 55%);
+        background-color: #f8fafc; /* slate-50 */
         background-attachment: fixed;
     }
 
-    .hero-section {
-        /* ... */
+    .navbar.bg-white {
+        background-color: rgba(255,255,255,0.85) !important;
+        backdrop-filter: saturate(180%) blur(8px);
     }
-    /* ... sisa kode CSS ... */
+
+    .navbar .nav-link {
+        color: #334155; /* slate-600 */
+    }
+    .navbar .nav-link:hover, .navbar .nav-link:focus {
+        color: var(--bs-link-color);
+    }
+    .navbar .nav-link.active {
+        color: var(--bs-link-color);
+        position: relative;
+    }
+    .navbar .nav-link.active::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -8px;
+        height: 2px;
+        background: linear-gradient(90deg, var(--bs-link-color), var(--bs-primary));
+        border-radius: 2px;
+        opacity: 0.85;
+    }
+
+    .card {
+        border-radius: 12px;
+    }
+
+    .table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: #ffffff;
+    }
+
+    .badge {
+        letter-spacing: .3px;
+    }
+
+    .dropdown-menu {
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(2, 6, 23, 0.08);
+    }
+
+    .footer {
+        background: linear-gradient(90deg, #0f172a, #0b1324);
+    }
 </style>

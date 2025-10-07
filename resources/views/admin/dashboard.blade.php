@@ -2,9 +2,120 @@
 
 @section('content')
 <div class="container">
+    {{-- Metrik ringkas --}}
+    @isset($metrics)
+    <div class="row g-3 mb-3">
+        <div class="col-12 col-md-3">
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #eef2ff, #e0e7ff);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="small text-muted">Total Laporan</div>
+                            <div class="h4 fw-bold mb-0">{{ $metrics['total'] ?? 0 }}</div>
+                        </div>
+                        <i class="bi bi-clipboard-data text-primary fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #fff7ed, #ffedd5);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="small text-muted">Pending</div>
+                            <div class="h4 fw-bold mb-0">{{ $metrics['pending'] ?? 0 }}</div>
+                        </div>
+                        <i class="bi bi-hourglass-split text-warning fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #ecfeff, #cffafe);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="small text-muted">In Progress</div>
+                            <div class="h4 fw-bold mb-0">{{ $metrics['in_progress'] ?? 0 }}</div>
+                        </div>
+                        <i class="bi bi-gear text-info fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #f0fdf4, #dcfce7);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="small text-muted">Completed</div>
+                            <div class="h4 fw-bold mb-0">{{ $metrics['completed'] ?? 0 }}</div>
+                        </div>
+                        <i class="bi bi-check2-circle text-success fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endisset
+
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="h4 fw-bold mb-0">Daftar Laporan</h2>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-success btn-sm" href="{{ route('dashboard.export', request()->query()) }}">
+                <i class="bi bi-filetype-csv"></i> Ekspor CSV
+            </a>
+            <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#filters" aria-expanded="false" aria-controls="filters">
+                <i class="bi bi-funnel"></i> Filter
+            </button>
+            <button class="btn btn-primary btn-sm" type="button" onclick="window.print()">
+                <i class="bi bi-printer"></i> Cetak
+            </button>
+        </div>
+    </div>
+    <div id="filters" class="collapse mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-3">
+                <form action="{{ route('dashboard') }}" method="GET">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small">Pencarian</label>
+                            <input name="q" value="{{ $search ?? request('q') }}" type="text" class="form-control" placeholder="Cari judul, deskripsi, lokasi" aria-label="Cari">
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label small">Kategori</label>
+                            <select name="category_id" class="form-select" aria-label="Filter Kategori">
+                                <option value="">Semua Kategori</option>
+                                @isset($categories)
+                                    @foreach ($categories as $cat)
+                                        <option value="{{ $cat->category_id }}" {{ (string)($categoryId ?? request('category_id')) === (string)$cat->category_id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                    @endforeach
+                                @endisset
+                            </select>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label small">Status</label>
+                            <select name="status" class="form-select" aria-label="Filter Status">
+                                <option value="">Semua Status</option>
+                                <option value="pending" {{ ($status ?? request('status')) === 'pending' ? 'selected' : '' }}>Pending</option>
+                                <option value="in_progress" {{ ($status ?? request('status')) === 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                                <option value="completed" {{ ($status ?? request('status')) === 'completed' ? 'selected' : '' }}>Completed</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-2 d-grid d-md-block">
+                            <button class="btn btn-primary w-100" type="submit"><i class="bi bi-search"></i> Terapkan</button>
+                        </div>
+                        <div class="col-12 col-md-auto">
+                            <a class="btn btn-outline-secondary w-100" href="{{ route('dashboard') }}">Reset</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <div class="card border-0 shadow-sm">
         <div class="card-body">
-            <h2 class="text-center mb-4">Daftar Laporan</h2>
 
             @if ($message = Session::get('success'))
                 <div class="alert alert-success">
@@ -39,18 +150,46 @@
                             <td>{{ $report->location }}</td>
                             <td>{{ $report->created_at->format('d M Y') }}</td>
                             <td>{{ Str::limit($report->description, 30) }}</td>
-                            <td><span class="badge bg-warning text-dark">{{ Str::title(str_replace('_', ' ', $report->status)) }}</span></td>
                             <td>
-                                {{-- KUMPULKAN SEMUA TOMBOL AKSI DI SINI --}}
-                                <form action="{{ route('reports.destroy', $report->report_id) }}" method="POST" class="d-inline-flex">
-                                    <a class="btn btn-info btn-sm me-1" href="{{ route('reports.show', $report->report_id) }}">Lihat</a>
-                                    <a class="btn btn-primary btn-sm me-1" href="{{ route('reports.edit', $report->report_id) }}">Edit</a>
-                                    
-                                    {{-- TAMBAHKAN FORM HAPUS INI --}}
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus laporan ini?')">Hapus</button>
-                                </form>
+                                @php
+                                    $status = Str::of($report->status)->replace('_', ' ')->title();
+                                    $badgeClass = 'bg-secondary';
+                                    if ($report->status === 'pending') $badgeClass = 'bg-warning text-dark';
+                                    elseif ($report->status === 'in_progress') $badgeClass = 'bg-info text-dark';
+                                    elseif ($report->status === 'completed') $badgeClass = 'bg-success';
+                                @endphp
+                                <span class="badge {{ $badgeClass }}">{{ $status }}</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    <div class="btn-group" role="group" aria-label="Navigasi Laporan">
+                                        <a class="btn btn-outline-secondary btn-sm" href="{{ route('reports.show', $report->report_id) }}" data-bs-toggle="tooltip" data-bs-title="Lihat Detail">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a class="btn btn-outline-primary btn-sm" href="{{ route('reports.edit', $report->report_id) }}" data-bs-toggle="tooltip" data-bs-title="Edit Laporan">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </div>
+                                    <form action="{{ route('reports.update', $report->report_id) }}" method="POST" class="d-inline-flex align-items-center gap-1">
+                                        @csrf
+                                        @method('PUT')
+                                        <select name="status" class="form-select form-select-sm" aria-label="Ubah status">
+                                            <option value="pending" {{ $report->status === 'pending' ? 'selected' : '' }}>Pending</option>
+                                            <option value="in_progress" {{ $report->status === 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                                            <option value="completed" {{ $report->status === 'completed' ? 'selected' : '' }}>Completed</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-success btn-sm" data-bs-toggle="tooltip" data-bs-title="Simpan status">
+                                            <i class="bi bi-check2"></i>
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('reports.destroy', $report->report_id) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus laporan ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" data-bs-toggle="tooltip" data-bs-title="Hapus Laporan">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                         @empty
