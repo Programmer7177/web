@@ -19,7 +19,11 @@ class FacilityReportController extends Controller
     public function index()
     {
         if (Auth::user()->role->name == 'admin_sarpras') {
-            $reports = FacilityReport::latest()->paginate(10);
+            // Admin hanya melihat laporan dari instansinya
+            $adminInstansiId = Auth::user()->instansi_id;
+            $reports = FacilityReport::where('instansi_id', $adminInstansiId)
+                                    ->latest()
+                                    ->paginate(10);
             $ratedReportIds = [];
         } else {
             $reports = FacilityReport::where('user_id', Auth::id())
