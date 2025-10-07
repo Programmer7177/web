@@ -14,15 +14,54 @@ class DashboardController extends Controller
     {
         // Cek peran pengguna yang sedang login
         if (Auth::user()->role->name == 'admin_sarpras') {
-        
+
             // --- LOGIKA UNTUK ADMIN ---
-            // Ambil semua laporan untuk ditampilkan di tabel
-            $reports = \App\Models\FacilityReport::with(['reporter', 'category', 'instansi'])
-                                                 ->latest()
-                                                 ->paginate(10);
-                                             
-            // Tampilkan view dashboard admin
-            return view('admin.dashboard', compact('reports'));
+            // KPI counts
+            $pendingCount = FacilityReport::where('status', 'pending')->count();
+            $inProgressCount = FacilityReport::where('status', 'in_progress')->count();
+            $completedCount = FacilityReport::where('status', 'completed')->count();
+            $totalReports = FacilityReport::count();
+
+            // Daily trend (last 7 days)
+            $startDate = Carbon::today()->subDays(6);
+            $rawDaily = FacilityReport::select(DB::raw('DATE(created_at) as d'), DB::raw('COUNT(*) as total'))
+                ->where('created_at', '>=', $startDate->copy()->startOfDay())
+                ->groupBy('d')
+                ->orderBy('d')
+                ->pluck('total', 'd')
+                ->toArray();
+            $trendLabels = [];
+            $trendCounts = [];
+            for ($i = 0; $i < 7; $i++) {
+                $date = $startDate->copy()->addDays($i);
+                $key = $date->toDateString();
+                $trendLabels[] = $date->translatedFormat('d M');
+                $trendCounts[] = isset($rawDaily[$key]) ? (int) $rawDaily[$key] : 0;
+            }
+
+            // Group by category for doughnut chart
+            $byCategory = FacilityReport::select('category_id', DB::raw('COUNT(*) as total'))
+                ->groupBy('category_id')
+                ->with('category:id,name')
+                ->get()
+                ->map(function ($row) {
+                    return [
+                        'label' => optional($row->category)->name ?? 'Tanpa Kategori',
+                        'value' => (int) $row->total,
+                    ];
+                });
+
+            // Recent reports table
+            $reports = FacilityReport::with(['reporter', 'category', 'instansi'])
+                ->latest()
+                ->paginate(10);
+
+            return view('admin.dashboard', compact(
+                'reports',
+                'pendingCount', 'inProgressCount', 'completedCount', 'totalReports',
+                'trendLabels', 'trendCounts',
+                'byCategory'
+            ));
 
         } else {
 
