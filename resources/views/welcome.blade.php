@@ -362,6 +362,28 @@
                 }, { threshold: 0.4 });
                 counters.forEach(el => obs.observe(el));
             }
+
+            // FAQ live search
+            const faqAccordion = document.getElementById('faqAccordion');
+            const searchBar = document.createElement('div');
+            searchBar.className = 'input-group mb-3';
+            searchBar.innerHTML = `
+                <span class="input-group-text bg-white"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242 1.106a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/></svg></span>
+                <input id="faqSearchInput" type="search" class="form-control" placeholder="Cari pertanyaan... (mis. status, laporan, unit)">
+            `;
+            const faqSectionTitle = document.querySelector('#faq .section-title');
+            if (faqSectionTitle && faqAccordion) {
+                faqSectionTitle.insertAdjacentElement('afterend', searchBar);
+                const input = document.getElementById('faqSearchInput');
+                input.addEventListener('input', function () {
+                    const term = this.value.toLowerCase().trim();
+                    const items = faqAccordion.querySelectorAll('.accordion-item');
+                    items.forEach(item => {
+                        const text = item.textContent.toLowerCase();
+                        item.style.display = text.includes(term) ? '' : 'none';
+                    });
+                });
+            }
         });
     </script>
 </body>

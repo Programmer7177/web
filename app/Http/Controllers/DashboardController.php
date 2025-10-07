@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\FacilityReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -26,12 +28,48 @@ class DashboardController extends Controller
 
             // --- LOGIKA UNTUK MAHASISWA (PENGGUNA BIASA) ---
             // Ambil data statistik seperti sebelumnya
-            $pendingCount = \App\Models\FacilityReport::where('status', 'pending')->count();
-            $inProgressCount = \App\Models\FacilityReport::where('status', 'in_progress')->count();
-            $completedCount = \App\Models\FacilityReport::where('status', 'completed')->count();
+            $pendingCount = FacilityReport::where('status', 'pending')->count();
+            $inProgressCount = FacilityReport::where('status', 'in_progress')->count();
+            $completedCount = FacilityReport::where('status', 'completed')->count();
+
+            $statusCounts = [
+                'pending' => $pendingCount,
+                'in_progress' => $inProgressCount,
+                'completed' => $completedCount,
+            ];
+
+            $startDate = Carbon::today()->subDays(6);
+            $rawDaily = FacilityReport::select(DB::raw('DATE(created_at) as d'), DB::raw('COUNT(*) as total'))
+                ->where('created_at', '>=', $startDate->copy()->startOfDay())
+                ->groupBy('d')
+                ->orderBy('d')
+                ->pluck('total', 'd')
+                ->toArray();
+
+            $trendLabels = [];
+            $trendCounts = [];
+            for ($i = 0; $i < 7; $i++) {
+                $date = $startDate->copy()->addDays($i);
+                $key = $date->toDateString();
+                $trendLabels[] = $date->translatedFormat('d M');
+                $trendCounts[] = isset($rawDaily[$key]) ? (int) $rawDaily[$key] : 0;
+            }
+
+            $latestReports = FacilityReport::where('user_id', Auth::id())
+                ->latest()
+                ->take(5)
+                ->get();
 
             // Tampilkan view dashboard mahasiswa yang sudah ada
-            return view('dashboard', compact('pendingCount', 'inProgressCount', 'completedCount'));
+            return view('dashboard', compact(
+                'pendingCount',
+                'inProgressCount',
+                'completedCount',
+                'statusCounts',
+                'trendLabels',
+                'trendCounts',
+                'latestReports'
+            ));
         }
     }
 }

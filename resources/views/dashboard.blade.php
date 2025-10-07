@@ -199,9 +199,173 @@
     <div class="stats-card">
         <h3 class="mb-4">Jumlah Laporan Saat Ini</h3>
         <div class="row justify-content-center">
-            <div class="col-md-3 col-6 mb-3"><h1>{{ $pendingCount }}</h1><p>Terkirim</p></div>
-            <div class="col-md-3 col-6 mb-3"><h1>{{ $inProgressCount }}</h1><p>Dalam Proses</p></div>
-            <div class="col-md-3 col-6 mb-3"><h1>{{ $completedCount }}</h1><p>Selesai</p></div>
+            <div class="col-md-3 col-6 mb-3"><h1 class="stat-number" data-countup data-target="{{ $pendingCount }}">0</h1><p>Terkirim</p></div>
+            <div class="col-md-3 col-6 mb-3"><h1 class="stat-number" data-countup data-target="{{ $inProgressCount }}">0</h1><p>Dalam Proses</p></div>
+            <div class="col-md-3 col-6 mb-3"><h1 class="stat-number" data-countup data-target="{{ $completedCount }}">0</h1><p>Selesai</p></div>
+        </div>
+    </div>
+
+    {{-- Widget Interaktif: Tren 7 Hari & Distribusi Status --}}
+    <div class="row g-4 mb-5">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">Tren Laporan 7 Hari Terakhir</h5>
+                        <span class="text-muted small">Semua laporan</span>
+                    </div>
+                    <canvas id="reportsTrendChart" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="mb-3">Distribusi Status</h5>
+                    <canvas id="statusDoughnutChart" height="200"></canvas>
+                    <div class="mt-3 d-flex flex-column gap-1">
+                        <div class="d-flex justify-content-between"><span class="badge bg-secondary">Terkirim</span><span>{{ $statusCounts['pending'] ?? $pendingCount }}</span></div>
+                        <div class="d-flex justify-content-between"><span class="badge bg-info text-dark">Dalam Proses</span><span>{{ $statusCounts['in_progress'] ?? $inProgressCount }}</span></div>
+                        <div class="d-flex justify-content-between"><span class="badge bg-success">Selesai</span><span>{{ $statusCounts['completed'] ?? $completedCount }}</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Laporan Terbaru --}}
+    <div class="card border-0 shadow-sm mb-5">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">Laporan Terbaru Anda</h5>
+                <a href="{{ route('reports.index') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
+            </div>
+            @if(isset($latestReports) && $latestReports->count())
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Judul</th>
+                                <th>Kategori</th>
+                                <th>Lokasi</th>
+                                <th>Status</th>
+                                <th>Tanggal</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($latestReports as $report)
+                                <tr>
+                                    <td>{{ Str::limit($report->title, 40) }}</td>
+                                    <td>{{ $report->category->name ?? '-' }}</td>
+                                    <td>{{ Str::limit($report->location, 24) }}</td>
+                                    <td>
+                                        @php
+                                            $badgeClass = match($report->status) {
+                                                'completed' => 'bg-success',
+                                                'in_progress' => 'bg-info text-dark',
+                                                'pending' => 'bg-warning text-dark',
+                                                default => 'bg-secondary',
+                                            };
+                                        @endphp
+                                        <span class="badge {{ $badgeClass }}">{{ Str::title(str_replace('_', ' ', $report->status)) }}</span>
+                                    </td>
+                                    <td>{{ $report->created_at->format('d M Y') }}</td>
+                                    <td>
+                                        <a href="{{ route('reports.show', $report->report_id) }}" class="btn btn-sm btn-outline-secondary">Lihat</a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <p class="text-muted mb-0">Belum ada laporan terbaru.</p>
+            @endif
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const counters = document.querySelectorAll('[data-countup]');
+  if (counters.length) {
+    const animateCounter = function (el, target) {
+      const duration = 1200;
+      const startTime = performance.now();
+      const step = function (now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const value = Math.floor(progress * target);
+        el.textContent = value.toString();
+        if (progress < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    };
+    const obs = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const target = parseInt(el.getAttribute('data-target') || '0', 10);
+          animateCounter(el, target);
+          observer.unobserve(el);
+        }
+      });
+    }, { threshold: 0.4 });
+    counters.forEach(el => obs.observe(el));
+  }
+
+  const trendLabels = @json($trendLabels ?? []);
+  const trendCounts = @json($trendCounts ?? []);
+  const statusCounts = @json($statusCounts ?? []);
+
+  const trendCtx = document.getElementById('reportsTrendChart');
+  if (trendCtx && window.Chart) {
+    new Chart(trendCtx, {
+      type: 'line',
+      data: {
+        labels: trendLabels,
+        datasets: [{
+          label: 'Total Laporan',
+          data: trendCounts,
+          fill: true,
+          borderColor: 'rgb(13,110,253)',
+          backgroundColor: 'rgba(13,110,253,0.1)',
+          tension: 0.35,
+          pointRadius: 3,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { beginAtZero: true, ticks: { precision:0 } }
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
+  }
+
+  const doughnutCtx = document.getElementById('statusDoughnutChart');
+  if (doughnutCtx && window.Chart) {
+    const values = [statusCounts.pending || 0, statusCounts.in_progress || 0, statusCounts.completed || 0];
+    new Chart(doughnutCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Terkirim', 'Dalam Proses', 'Selesai'],
+        datasets: [{
+          data: values,
+          backgroundColor: ['#ffc107', '#0dcaf0', '#198754'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        cutout: '60%'
+      }
+    });
+  }
+});
+</script>
+@endpush
