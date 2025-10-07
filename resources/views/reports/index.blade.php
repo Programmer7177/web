@@ -23,7 +23,7 @@
                             <th>Judul</th>
                             <th>Lokasi</th>
                             <th>Status</th>
-                            <th width="200px">Aksi</th>
+                            <th width="280px">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -34,13 +34,23 @@
                             <td>{{ $report->location }}</td>
                             <td><span class="badge bg-warning text-dark">{{ Str::title(str_replace('_', ' ', $report->status)) }}</span></td>
                             <td>
-                                <form action="{{ route('reports.destroy',$report->report_id) }}" method="POST">
-                                    <a class="btn btn-info btn-sm" href="{{ route('reports.show',$report->report_id) }}">Lihat</a>
-                                    <a class="btn btn-primary btn-sm" href="{{ route('reports.edit',$report->report_id) }}">Edit</a>
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus laporan ini?')">Hapus</button>
-                                </form>
+                                <div class="d-flex gap-2">
+                                    <form action="{{ route('reports.destroy',$report->report_id) }}" method="POST" class="d-inline">
+                                        <a class="btn btn-info btn-sm" href="{{ route('reports.show',$report->report_id) }}">Lihat</a>
+                                        <a class="btn btn-primary btn-sm" href="{{ route('reports.edit',$report->report_id) }}">Edit</a>
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus laporan ini?')">Hapus</button>
+                                    </form>
+
+                                    @if ($report->status === 'completed' && Auth::id() === $report->user_id)
+                                        @if (!in_array($report->report_id, $ratedReportIds))
+                                            <a href="{{ route('reports.show', $report->report_id) }}#beri-rating" class="btn btn-warning btn-sm">Beri Rating</a>
+                                        @else
+                                            <span class="badge bg-success align-self-center">Sudah dirating</span>
+                                        @endif
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                         @empty

@@ -52,6 +52,68 @@
             </div>
         </div>
 
+    {{-- BAGIAN RATING UNTUK USER --}}
+    @if(Auth::id() === $report->user_id && $report->status === 'completed')
+        <div id="beri-rating" class="card shadow-sm mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Beri Rating Penyelesaian</h4>
+                @if($userRating)
+                    <span class="badge bg-success">Anda sudah memberi rating</span>
+                @endif
+            </div>
+            <div class="card-body">
+                @if (session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                @endif
+                @if (session('error'))
+                    <div class="alert alert-danger">{{ session('error') }}</div>
+                @endif
+                @if (session('info'))
+                    <div class="alert alert-info">{{ session('info') }}</div>
+                @endif
+
+                @if(!$userRating)
+                <form action="{{ url('reports/'.$report->report_id.'/rating') }}" method="POST" class="row g-3">
+                    @csrf
+                    <div class="col-12">
+                        <label class="form-label">Penilaian</label>
+                        <div class="d-flex gap-2 align-items-center">
+                            @for ($i = 1; $i <= 5; $i++)
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="rating_value" id="rating{{ $i }}" value="{{ $i }}" required>
+                                    <label class="form-check-label" for="rating{{ $i }}">{{ $i }}</label>
+                                </div>
+                            @endfor
+                        </div>
+                        @error('rating_value')
+                            <div class="text-danger small">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-12">
+                        <label for="comment" class="form-label">Komentar (opsional)</label>
+                        <textarea id="comment" name="comment" class="form-control" rows="3" placeholder="Tulis pengalaman Anda"></textarea>
+                        @error('comment')
+                            <div class="text-danger small">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-warning">Kirim Rating</button>
+                    </div>
+                </form>
+                @else
+                    <div>
+                        <p class="mb-1">Rating Anda: <strong>{{ $userRating->rating_value }}/5</strong></p>
+                        @if($userRating->comment)
+                            <p class="mb-0">Komentar: {{ $userRating->comment }}</p>
+                        @endif
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endif
+
     {{-- BAGIAN KOMENTAR --}}
     <div class="card shadow-sm">
         <div class="card-header bg-white">
