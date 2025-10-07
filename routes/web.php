@@ -14,7 +14,12 @@ use App\Http\Controllers\PageController; // REVISI: Backslash yang benar
 
 // Halaman utama untuk tamu (yang belum login)
 Route::get('/', function () {
-    return view('welcome');
+    // Hitung jumlah laporan berdasarkan status untuk ditampilkan di landing page
+    $pendingCount = \App\Models\FacilityReport::where('status', 'pending')->count();
+    $inProgressCount = \App\Models\FacilityReport::where('status', 'in_progress')->count();
+    $completedCount = \App\Models\FacilityReport::where('status', 'completed')->count();
+
+    return view('welcome', compact('pendingCount', 'inProgressCount', 'completedCount'));
 });
 
 // Grup route yang HANYA BISA DIAKSES SETELAH LOGIN
