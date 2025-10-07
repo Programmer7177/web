@@ -140,9 +140,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($reports as $report)
+                        @forelse ($reports as $index => $report)
                         <tr>
-                            <td>#{{ $report->report_id }}</td>
+                            <td>#{{ ($reports->currentPage() - 1) * $reports->perPage() + $index + 1 }}</td>
                             <td>{{ $report->reporter->username ?? 'N/A' }}</td>
                             <td>{{ $report->category->name }}</td>
                             <td>{{ $report->instansi->name ?? 'N/A' }}</td>

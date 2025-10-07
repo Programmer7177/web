@@ -27,9 +27,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($reports as $report)
+                        @forelse ($reports as $index => $report)
                         <tr>
-                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ ($reports->currentPage() - 1) * $reports->perPage() + $index + 1 }}</td>
                             <td>{{ $report->title }}</td>
                             <td>{{ $report->location }}</td>
                             <td><span class="badge bg-warning text-dark">{{ Str::title(str_replace('_', ' ', $report->status)) }}</span></td>
