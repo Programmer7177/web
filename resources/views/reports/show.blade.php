@@ -77,13 +77,8 @@
                     @csrf
                     <div class="col-12">
                         <label class="form-label">Penilaian</label>
-                        <div class="d-flex gap-2 align-items-center">
-                            @for ($i = 1; $i <= 5; $i++)
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="rating_value" id="rating{{ $i }}" value="{{ $i }}" required>
-                                    <label class="form-check-label" for="rating{{ $i }}">{{ $i }}</label>
-                                </div>
-                            @endfor
+                        <div class="mb-3">
+                            <x-star-rating :rating="0" :interactive="true" size="lg" />
                         </div>
                         @error('rating_value')
                             <div class="text-danger small">{{ $message }}</div>
@@ -104,9 +99,10 @@
                 </form>
                 @else
                     <div>
-                        <p class="mb-1">Rating Anda: <strong>{{ $userRating->rating_value }}/5</strong></p>
+                        <p class="mb-2">Rating Anda:</p>
+                        <x-star-rating :rating="$userRating->rating_value" :interactive="false" size="lg" />
                         @if($userRating->comment)
-                            <p class="mb-0">Komentar: {{ $userRating->comment }}</p>
+                            <p class="mt-3 mb-0"><strong>Komentar:</strong> {{ $userRating->comment }}</p>
                         @endif
                     </div>
                 @endif
@@ -114,7 +110,8 @@
         </div>
     @endif
 
-    {{-- BAGIAN KOMENTAR --}}
+    {{-- BAGIAN KOMENTAR - Hanya tampil jika user belum memberikan rating --}}
+    @if(Auth::id() !== $report->user_id || !$userRating)
     <div class="card shadow-sm">
         <div class="card-header bg-white">
             <h4 class="mb-0">Diskusi / Tindak Lanjut</h4>
@@ -156,5 +153,6 @@
             </form>
         </div>
     </div>
+    @endif
 </div>
 @endsection

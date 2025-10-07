@@ -19,10 +19,11 @@ class FacilityReportController extends Controller
     public function index()
     {
         if (Auth::user()->role->name == 'admin_sarpras') {
-            $reports = FacilityReport::latest()->paginate(10);
+            $reports = FacilityReport::withCount('ratings')->latest()->paginate(10);
             $ratedReportIds = [];
         } else {
             $reports = FacilityReport::where('user_id', Auth::id())
+                                     ->withCount('ratings')
                                      ->latest()
                                      ->paginate(10);
             $ratedReportIds = Rating::where('user_id', Auth::id())
