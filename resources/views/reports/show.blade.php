@@ -1,5 +1,20 @@
 @extends(Auth::user()->role->name == 'admin_sarpras' ? 'layouts.admin' : 'layouts.app')
 
+@push('styles')
+<style>
+    /* Full-bleed footer strip */
+    .footer-strip {
+        margin-top: 4rem;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        background-color: #0B4A8B;
+        color: #ffffff;
+        text-align: center;
+        padding: 18px 16px;
+    }
+</style>
+@endpush
+
 @section('content')
     {{-- KARTU DETAIL LAPORAN --}}
     <div class="card shadow-sm mb-4">
@@ -217,5 +232,10 @@
         </div>
     </div>
     @endif
+
+    {{-- Footer strip --}}
+    <div class="footer-strip">
+        © 2025 LaporUnair. All Rights Reserved.
+    </div>
 </div>
 @endsection

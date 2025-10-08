@@ -88,6 +88,17 @@
             box-shadow: 0 10px 24px rgba(13,110,253,0.35);
         }
         .back-to-top:hover { background: #0b5ed7; }
+
+        /* Full-bleed footer strip */
+        .footer-strip {
+            margin-top: 4rem;
+            margin-left: calc(-50vw + 50%);
+            margin-right: calc(-50vw + 50%);
+            background-color: #0B4A8B;
+            color: #ffffff;
+            text-align: center;
+            padding: 18px 16px;
+        }
     </style>
 </head>
 <body>
@@ -284,6 +295,11 @@
             </section>
         </div>
     </main>
+
+    {{-- Footer strip --}}
+    <div class="footer-strip">
+        © 2025 LaporUnair. All Rights Reserved.
+    </div>
 
     <button class="back-to-top" aria-label="Kembali ke atas">▲</button>
 

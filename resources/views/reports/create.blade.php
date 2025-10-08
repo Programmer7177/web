@@ -31,6 +31,17 @@
         padding: 10px 30px;
         float: right;
     }
+
+    /* Full-bleed footer strip */
+    .footer-strip {
+        margin-top: 4rem;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        background-color: #0B4A8B;
+        color: #ffffff;
+        text-align: center;
+        padding: 18px 16px;
+    }
 </style>
 @endpush
 
@@ -130,4 +141,9 @@
             });
         });
     </script>
+
+    {{-- Footer strip --}}
+    <div class="footer-strip">
+        © 2025 LaporUnair. All Rights Reserved.
+    </div>
 @endsection
