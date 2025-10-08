@@ -188,4 +188,20 @@ class FacilityReportController extends Controller
         }
     }
 
+    /**
+     * Get instansi by jenis (AJAX endpoint)
+     */
+    public function getInstansiByType(Request $request)
+    {
+        $jenis = $request->input('jenis');
+        
+        if (!$jenis) {
+            return response()->json([]);
+        }
+        
+        $instansis = Instansi::where('jenis', $jenis)->get();
+        
+        return response()->json($instansis);
+    }
+
 }

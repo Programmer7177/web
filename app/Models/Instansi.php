@@ -17,6 +17,7 @@ class Instansi extends Model
     protected $fillable = [
         'name',
         'code',
+        'jenis',
     ];
 
     /**

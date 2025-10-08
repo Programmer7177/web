@@ -46,42 +46,19 @@
                         </select>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="instansi_id" class="form-label">Instansi</label>
+                        <label for="jenis_instansi" class="form-label">Jenis Instansi</label>
+                        <select class="form-select" id="jenis_instansi" name="jenis_instansi" {{ $isAdmin ? 'disabled' : '' }}>
+                            <option selected disabled value="">Pilih Jenis Instansi...</option>
+                            <option value="fakultas" {{ old('jenis_instansi', $report->instansi->jenis ?? '') == 'fakultas' ? 'selected' : '' }}>🏛️ Fakultas</option>
+                            <option value="perpustakaan" {{ old('jenis_instansi', $report->instansi->jenis ?? '') == 'perpustakaan' ? 'selected' : '' }}>📚 Perpustakaan</option>
+                            <option value="lainnya" {{ old('jenis_instansi', $report->instansi->jenis ?? '') == 'lainnya' ? 'selected' : '' }}>🏢 Lainnya</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="instansi_id" class="form-label">Nama Instansi</label>
                         <select name="instansi_id" id="instansi_id" class="form-select" {{ $isAdmin ? 'disabled' : '' }}>
-                            <option value="">Pilih Instansi...</option>
-                            
-                            {{-- Fakultas --}}
-                            <optgroup label="🏛️ FAKULTAS">
-                                @foreach ($instansis as $instansi)
-                                    @if(str_starts_with($instansi->name, 'Fakultas'))
-                                        <option value="{{ $instansi->instansi_id }}" {{ old('instansi_id', $report->instansi_id) == $instansi->instansi_id ? 'selected' : '' }}>
-                                            {{ $instansi->name }}
-                                        </option>
-                                    @endif
-                                @endforeach
-                            </optgroup>
-                            
-                            {{-- Perpustakaan --}}
-                            <optgroup label="📚 PERPUSTAKAAN">
-                                @foreach ($instansis as $instansi)
-                                    @if(str_starts_with($instansi->name, 'Perpustakaan'))
-                                        <option value="{{ $instansi->instansi_id }}" {{ old('instansi_id', $report->instansi_id) == $instansi->instansi_id ? 'selected' : '' }}>
-                                            {{ $instansi->name }}
-                                        </option>
-                                    @endif
-                                @endforeach
-                            </optgroup>
-                            
-                            {{-- Masjid --}}
-                            <optgroup label="🕌 MASJID">
-                                @foreach ($instansis as $instansi)
-                                    @if(str_starts_with($instansi->name, 'Masjid'))
-                                        <option value="{{ $instansi->instansi_id }}" {{ old('instansi_id', $report->instansi_id) == $instansi->instansi_id ? 'selected' : '' }}>
-                                            {{ $instansi->name }}
-                                        </option>
-                                    @endif
-                                @endforeach
-                            </optgroup>
+                            <option value="">Pilih Nama Instansi...</option>
                         </select>
                     </div>
                     <div class="col-md-12 mb-3">
@@ -119,5 +96,59 @@
             </form>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const jenisInstansiSelect = document.getElementById('jenis_instansi');
+            const instansiSelect = document.getElementById('instansi_id');
+            const currentInstansiId = {{ $report->instansi_id }};
+            const currentJenis = '{{ $report->instansi->jenis ?? "" }}';
+            
+            // Load instansi based on current jenis
+            if (currentJenis) {
+                loadInstansiByJenis(currentJenis, currentInstansiId);
+            }
+            
+            jenisInstansiSelect.addEventListener('change', function() {
+                const jenis = this.value;
+                loadInstansiByJenis(jenis);
+            });
+            
+            function loadInstansiByJenis(jenis, selectedId = null) {
+                if (!jenis) {
+                    instansiSelect.innerHTML = '<option value="">Pilih Jenis Instansi terlebih dahulu...</option>';
+                    instansiSelect.disabled = true;
+                    return;
+                }
+                
+                // Enable instansi select
+                instansiSelect.disabled = false;
+                instansiSelect.innerHTML = '<option value="">Memuat...</option>';
+                
+                // Fetch instansi berdasarkan jenis
+                fetch(`{{ route('reports.get-instansi-by-type') }}?jenis=${jenis}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        instansiSelect.innerHTML = '<option value="">Pilih Nama Instansi...</option>';
+                        
+                        data.forEach(instansi => {
+                            const option = document.createElement('option');
+                            option.value = instansi.instansi_id;
+                            option.textContent = instansi.name;
+                            
+                            if (selectedId && instansi.instansi_id == selectedId) {
+                                option.selected = true;
+                            }
+                            
+                            instansiSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        instansiSelect.innerHTML = '<option value="">Error loading data</option>';
+                    });
+            }
+        });
+    </script>
 @endsection
 
