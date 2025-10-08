@@ -83,10 +83,7 @@
     }
 
     .stats-card {
-        background-image: url('{{ asset('images/Union.png') }}');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
+        background-color: #3b82f6;
         color: white;
         padding: 5rem 2rem;
         text-align: center;
