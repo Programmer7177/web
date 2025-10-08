@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\FacilityReport;
 use App\Models\Category;
 use App\Models\Instansi;
-use App\Models\InstansiType;
 use App\Models\Rating;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -40,9 +39,8 @@ class FacilityReportController extends Controller
     public function create()
     {
         $categories = Category::all();
-        $instansiTypes = InstansiType::all();
-        $instansis = Instansi::with('instansiType')->get();
-        return view('reports.create', compact('categories', 'instansiTypes', 'instansis'));
+        $instansis = Instansi::all();
+        return view('reports.create', compact('categories', 'instansis'));
     }
 
     /**
@@ -53,7 +51,6 @@ class FacilityReportController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,category_id',
-            'instansi_type_id' => 'required|exists:instansi_types,instansi_type_id',
             'instansi_id' => 'required|exists:instansi,instansi_id',
             'description' => 'required|string',
             'location' => 'required|string|max:255',
@@ -68,7 +65,6 @@ class FacilityReportController extends Controller
         FacilityReport::create([
             'title' => $request->title,
             'category_id' => $request->category_id,
-            'instansi_type_id' => $request->instansi_type_id,
             'instansi_id' => $request->instansi_id,
             'description' => $request->description,
             'location' => $request->location,
@@ -112,9 +108,8 @@ class FacilityReportController extends Controller
     public function edit(FacilityReport $report)
     {
         $categories = Category::all();
-        $instansiTypes = InstansiType::all();
-        $instansis = Instansi::with('instansiType')->get();
-        return view('reports.edit', compact('report', 'categories', 'instansiTypes', 'instansis'));
+        $instansis = Instansi::all();
+        return view('reports.edit', compact('report', 'categories', 'instansis'));
     }
 
     /**
@@ -143,7 +138,6 @@ class FacilityReportController extends Controller
             $rules = [
                 'title' => 'required|string|max:255',
                 'category_id' => 'required|exists:categories,category_id',
-                'instansi_type_id' => 'required|exists:instansi_types,instansi_type_id',
                 'instansi_id' => 'required|exists:instansi,instansi_id',
                 'description' => 'required|string',
                 'location' => 'required|string|max:255',
@@ -194,21 +188,4 @@ class FacilityReportController extends Controller
         }
     }
 
-    /**
-     * Get instansi by type (AJAX endpoint)
-     */
-    public function getInstansiByType(Request $request)
-    {
-        $instansiTypeId = $request->input('instansi_type_id');
-        
-        if (!$instansiTypeId) {
-            return response()->json(['instansis' => []]);
-        }
-        
-        $instansis = Instansi::where('instansi_type_id', $instansiTypeId)
-                            ->select('instansi_id', 'name', 'code')
-                            ->get();
-        
-        return response()->json(['instansis' => $instansis]);
-    }
 }

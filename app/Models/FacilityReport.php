@@ -16,7 +16,6 @@ class FacilityReport extends Model
         'category_id',
         'asset_id',
         'instansi_id',
-        'instansi_type_id',
         'assigned_to',
         'title',
         'description',
@@ -74,13 +73,6 @@ class FacilityReport extends Model
         return $this->belongsTo(Instansi::class, 'instansi_id');
     }
 
-    /**
-     * Laporan ini terkait dengan satu InstansiType.
-     */
-    public function instansiType()
-    {
-        return $this->belongsTo(InstansiType::class, 'instansi_type_id');
-    }
 
     public function comments()
     {

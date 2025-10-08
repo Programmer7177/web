@@ -17,7 +17,6 @@ class Instansi extends Model
     protected $fillable = [
         'name',
         'code',
-        'instansi_type_id',
     ];
 
     /**
@@ -36,11 +35,4 @@ class Instansi extends Model
         return $this->hasMany(Asset::class, 'instansi_id');
     }
 
-    /**
-     * Satu Instansi dimiliki oleh satu InstansiType.
-     */
-    public function instansiType()
-    {
-        return $this->belongsTo(InstansiType::class, 'instansi_type_id');
-    }
 }
