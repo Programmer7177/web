@@ -6,6 +6,7 @@
     <title>Lapor UNAIR — Pelaporan Masalah Kampus</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://unpkg.com/aos@next/dist/aos.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
     <style>
         html { scroll-behavior: smooth; }
@@ -88,6 +89,18 @@
             box-shadow: 0 10px 24px rgba(13,110,253,0.35);
         }
         .back-to-top:hover { background: #0b5ed7; }
+
+        /* Error Alert Styling */
+        .alert-danger {
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+            border: 1px solid #fca5a5;
+            color: #dc2626;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);
+        }
+        .alert-danger .btn-close {
+            filter: invert(1);
+        }
     </style>
 </head>
 <body>
@@ -266,15 +279,33 @@
             <section id="login-section" class="my-5 py-3">
                 <div class="login-card" data-aos="fade-up">
                     <h2 class="text-center mb-4">Login</h2>
+                    
+                    <!-- Error Messages -->
+                    @if ($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            @foreach ($errors->all() as $error)
+                                {{ $error }}
+                            @endforeach
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+                    
                     <form method="POST" action="{{ route('login') }}">
                         @csrf
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input id="email" class="form-control" type="email" name="email" :value="old('email')">
+                            <input id="email" class="form-control @error('email') is-invalid @enderror" type="email" name="email" value="{{ old('email') }}" required autofocus>
+                            @error('email')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
-                            <input id="password" class="form-control" type="password" name="password" required>
+                            <input id="password" class="form-control @error('password') is-invalid @enderror" type="password" name="password" required>
+                            @error('password')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <a href="{{ route('password.request') }}" class="text-sm">Lupa password?</a>
@@ -393,6 +424,17 @@
                     window.addEventListener('scroll', onScrollToast, { passive: true });
                 }
             } catch (e) {}
+
+            // Auto scroll to login section if there are errors
+            const hasErrors = document.querySelector('.alert-danger');
+            if (hasErrors) {
+                setTimeout(() => {
+                    const loginSection = document.getElementById('login-section');
+                    if (loginSection) {
+                        loginSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 500);
+            }
         });
     </script>
 </body>
