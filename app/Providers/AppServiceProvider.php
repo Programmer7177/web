@@ -19,6 +19,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Set pagination view to use Bootstrap 5 styling
+        \Illuminate\Pagination\Paginator::defaultView('pagination.bootstrap-5');
+        \Illuminate\Pagination\Paginator::defaultSimpleView('pagination.bootstrap-5');
     }
 }
