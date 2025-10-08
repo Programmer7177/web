@@ -1,5 +1,20 @@
 @extends(Auth::user()->role->name == 'admin_sarpras' ? 'layouts.admin' : 'layouts.app')
 
+@push('styles')
+<style>
+    /* Full-bleed footer strip */
+    .footer-strip {
+        margin-top: 4rem;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        background-color: #0B4A8B;
+        color: #ffffff;
+        text-align: center;
+        padding: 18px 16px;
+    }
+</style>
+@endpush
+
 @section('content')
     <div class="card shadow-sm">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
@@ -46,13 +61,19 @@
                         </select>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="instansi_id" class="form-label">Instansi</label>
-                        <select name="instansi_id" class="form-select" {{ $isAdmin ? 'disabled' : '' }}>
-                            @foreach ($instansis as $instansi)
-                                <option value="{{ $instansi->instansi_id }}" {{ old('instansi_id', $report->instansi_id) == $instansi->instansi_id ? 'selected' : '' }}>
-                                    {{ $instansi->name }}
-                                </option>
-                            @endforeach
+                        <label for="jenis_instansi" class="form-label">Jenis Instansi</label>
+                        <select class="form-select" id="jenis_instansi" name="jenis_instansi" {{ $isAdmin ? 'disabled' : '' }}>
+                            <option selected disabled value="">Pilih Jenis Instansi...</option>
+                            <option value="fakultas" {{ old('jenis_instansi', $report->instansi->jenis ?? '') == 'fakultas' ? 'selected' : '' }}>🏛️ Fakultas</option>
+                            <option value="perpustakaan" {{ old('jenis_instansi', $report->instansi->jenis ?? '') == 'perpustakaan' ? 'selected' : '' }}>📚 Perpustakaan</option>
+                            <option value="lainnya" {{ old('jenis_instansi', $report->instansi->jenis ?? '') == 'lainnya' ? 'selected' : '' }}>🏢 Lainnya</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="instansi_id" class="form-label">Nama Instansi</label>
+                        <select name="instansi_id" id="instansi_id" class="form-select" {{ $isAdmin ? 'disabled' : '' }}>
+                            <option value="">Pilih Nama Instansi...</option>
                         </select>
                     </div>
                     <div class="col-md-12 mb-3">
@@ -89,6 +110,65 @@
                 </div>
             </form>
         </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const jenisInstansiSelect = document.getElementById('jenis_instansi');
+            const instansiSelect = document.getElementById('instansi_id');
+            const currentInstansiId = {{ $report->instansi_id }};
+            const currentJenis = '{{ $report->instansi->jenis ?? "" }}';
+            
+            // Load instansi based on current jenis
+            if (currentJenis) {
+                loadInstansiByJenis(currentJenis, currentInstansiId);
+            }
+            
+            jenisInstansiSelect.addEventListener('change', function() {
+                const jenis = this.value;
+                loadInstansiByJenis(jenis);
+            });
+            
+            function loadInstansiByJenis(jenis, selectedId = null) {
+                if (!jenis) {
+                    instansiSelect.innerHTML = '<option value="">Pilih Jenis Instansi terlebih dahulu...</option>';
+                    instansiSelect.disabled = true;
+                    return;
+                }
+                
+                // Enable instansi select
+                instansiSelect.disabled = false;
+                instansiSelect.innerHTML = '<option value="">Memuat...</option>';
+                
+                // Fetch instansi berdasarkan jenis
+                fetch(`{{ route('reports.get-instansi-by-type') }}?jenis=${jenis}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        instansiSelect.innerHTML = '<option value="">Pilih Nama Instansi...</option>';
+                        
+                        data.forEach(instansi => {
+                            const option = document.createElement('option');
+                            option.value = instansi.instansi_id;
+                            option.textContent = instansi.name;
+                            
+                            if (selectedId && instansi.instansi_id == selectedId) {
+                                option.selected = true;
+                            }
+                            
+                            instansiSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        instansiSelect.innerHTML = '<option value="">Error loading data</option>';
+                    });
+            }
+        });
+    </script>
+
+    {{-- Footer strip --}}
+    <div class="footer-strip">
+        © 2025 LaporUnair. All Rights Reserved.
     </div>
 @endsection
 

@@ -15,13 +15,13 @@ class FacilityReport extends Model
         'user_id',
         'category_id',
         'asset_id',
-        'instansi_id', // Pastikan ini sudah ada
+        'instansi_id',
         'assigned_to',
         'title',
         'description',
         'location',
         'status',
-        'attachment_path', // Pastikan ini sudah ada
+        'attachment_path',
     ];
 
     /**
@@ -72,6 +72,7 @@ class FacilityReport extends Model
     {
         return $this->belongsTo(Instansi::class, 'instansi_id');
     }
+
 
     public function comments()
     {

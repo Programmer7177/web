@@ -157,6 +157,27 @@
         width: 100% !important;
         height: 100% !important;
     }
+
+    /* Full-bleed footer strip */
+    .footer-strip {
+        position: relative;
+        width: 100vw;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+        margin-top: 4rem;
+        background-color: #0B4A8B;
+        color: #ffffff;
+        text-align: center;
+        padding: 18px 16px;
+        z-index: 1;
+    }
+    
+    /* Ensure body doesn't have horizontal scroll */
+    body {
+        overflow-x: hidden;
+    }
 </style>
 @endpush
 
@@ -233,13 +254,13 @@
                 </div>
             </div>
         </div>
-        {{-- Footer strip --}}
-            <div class="footer-strip">
-                © 2025 LaporUnair. All Rights Reserved.
-            </div>
-        </div>
     </div>
 @endsection
+
+{{-- Footer strip outside content section --}}
+<div class="footer-strip">
+    © 2025 LaporUnair. All Rights Reserved.
+</div>
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>

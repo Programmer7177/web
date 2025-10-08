@@ -19,10 +19,11 @@ class FacilityReportController extends Controller
     public function index()
     {
         if (Auth::user()->role->name == 'admin_sarpras') {
-            $reports = FacilityReport::latest()->paginate(10);
+            $reports = FacilityReport::withCount('ratings')->latest()->paginate(10);
             $ratedReportIds = [];
         } else {
             $reports = FacilityReport::where('user_id', Auth::id())
+                                     ->withCount('ratings')
                                      ->latest()
                                      ->paginate(10);
             $ratedReportIds = Rating::where('user_id', Auth::id())
@@ -186,4 +187,21 @@ class FacilityReportController extends Controller
             return redirect()->route('reports.index')->with('success', 'Laporan berhasil dihapus!');
         }
     }
+
+    /**
+     * Get instansi by jenis (AJAX endpoint)
+     */
+    public function getInstansiByType(Request $request)
+    {
+        $jenis = $request->input('jenis');
+        
+        if (!$jenis) {
+            return response()->json([]);
+        }
+        
+        $instansis = Instansi::where('jenis', $jenis)->get();
+        
+        return response()->json($instansis);
+    }
+
 }

@@ -1,5 +1,20 @@
 @extends('layouts.app')
 
+@push('styles')
+<style>
+    /* Full-bleed footer strip */
+    .footer-strip {
+        margin-top: 4rem;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        background-color: #0B4A8B;
+        color: #ffffff;
+        text-align: center;
+        padding: 18px 16px;
+    }
+</style>
+@endpush
+
 @section('content')
     <div class="card shadow-sm">
         <div class="card-header bg-white">
@@ -35,22 +50,26 @@
                             <td><span class="badge bg-warning text-dark">{{ Str::title(str_replace('_', ' ', $report->status)) }}</span></td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <form action="{{ route('reports.destroy',$report->report_id) }}" method="POST" class="d-inline">
-                                        <a class="btn btn-info btn-sm" href="{{ route('reports.show',$report->report_id) }}">Lihat</a>
-                                        <a class="btn btn-primary btn-sm" href="{{ route('reports.edit',$report->report_id) }}">Edit</a>
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus laporan ini?')">Hapus</button>
-                                    </form>
+                                    <a class="btn btn-info btn-sm" href="{{ route('reports.show',$report->report_id) }}">Lihat</a>
+                                    
+                                    @php
+                                        $alreadyRated = $report->ratings_count > 0;
+                                    @endphp
+                                    
+                                    @if ($report->status !== 'completed' || !$alreadyRated)
+                                        <form action="{{ route('reports.destroy',$report->report_id) }}" method="POST" class="d-inline">
+                                            <a class="btn btn-primary btn-sm" href="{{ route('reports.edit',$report->report_id) }}">Edit</a>
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus laporan ini?')">Hapus</button>
+                                        </form>
+                                    @endif
 
                                     @if ($report->status === 'completed')
-                                        @php
-                                            $alreadyRated = $report->ratings_count > 0;
-                                        @endphp
                                         @if (!$alreadyRated)
                                             <a href="{{ route('reports.show', $report->report_id) }}#beri-rating" class="btn btn-warning btn-sm">Beri Rating</a>
                                         @else
-                                            <span class="badge bg-success align-self-center">Sudah dirating</span>
+                                            <a href="{{ route('reports.show', $report->report_id) }}#beri-rating" class="btn btn-secondary btn-sm">Sudah dirating</a>
                                         @endif
                                     @endif
                                 </div>
@@ -70,5 +89,10 @@
                 {!! $reports->links() !!}
             </div>
         </div>
+    </div>
+
+    {{-- Footer strip --}}
+    <div class="footer-strip">
+        © 2025 LaporUnair. All Rights Reserved.
     </div>
 @endsection

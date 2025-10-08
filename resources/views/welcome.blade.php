@@ -88,6 +88,17 @@
             box-shadow: 0 10px 24px rgba(13,110,253,0.35);
         }
         .back-to-top:hover { background: #0b5ed7; }
+
+        /* Full-bleed footer strip */
+        .footer-strip {
+            margin-top: 4rem;
+            margin-left: calc(-50vw + 50%);
+            margin-right: calc(-50vw + 50%);
+            background-color: #0B4A8B;
+            color: #ffffff;
+            text-align: center;
+            padding: 18px 16px;
+        }
     </style>
 </head>
 <body>
@@ -276,18 +287,19 @@
                             <label for="password" class="form-label">Password</label>
                             <input id="password" class="form-control" type="password" name="password" required>
                         </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <a href="{{ route('password.request') }}" class="text-sm">Lupa password?</a>
+                        <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-primary rounded-pill px-4">Login</button>
                         </div>
-                        <p class="text-center mt-4 text-sm">
-                            Belum punya akun? <a href="{{ route('register') }}">Daftar di sini</a>
-                        </p>
                     </form>
                 </div>
             </section>
         </div>
     </main>
+
+    {{-- Footer strip --}}
+    <div class="footer-strip">
+        © 2025 LaporUnair. All Rights Reserved.
+    </div>
 
     <button class="back-to-top" aria-label="Kembali ke atas">▲</button>
 

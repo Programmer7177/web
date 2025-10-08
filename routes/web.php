@@ -53,6 +53,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Route untuk menyimpan rating laporan yang telah selesai
     Route::post('reports/{report}/rating', [RatingController::class, 'store'])->name('reports.rating.store');
     
+    // AJAX endpoint untuk mendapatkan instansi berdasarkan jenis
+    Route::get('/reports/get-instansi-by-type', [FacilityReportController::class, 'getInstansiByType'])->name('reports.get-instansi-by-type');
+    
     // ℹ️ Halaman tentang layanan
     Route::get('/tentang-layanan', [PageController::class, 'about'])->name('pages.about');
 });

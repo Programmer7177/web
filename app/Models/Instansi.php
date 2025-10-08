@@ -17,6 +17,7 @@ class Instansi extends Model
     protected $fillable = [
         'name',
         'code',
+        'jenis',
     ];
 
     /**
@@ -34,4 +35,5 @@ class Instansi extends Model
     {
         return $this->hasMany(Asset::class, 'instansi_id');
     }
+
 }

@@ -31,6 +31,17 @@
         padding: 10px 30px;
         float: right;
     }
+
+    /* Full-bleed footer strip */
+    .footer-strip {
+        margin-top: 4rem;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        background-color: #0B4A8B;
+        color: #ffffff;
+        text-align: center;
+        padding: 18px 16px;
+    }
 </style>
 @endpush
 
@@ -51,15 +62,22 @@
                 </select>
             </div>
 
-            <div class="mb-3">
-                <label for="instansi_id" class="form-label">Instansi</label>
-                <select class="form-select" id="instansi_id" name="instansi_id" required>
-                    <option selected disabled value="">Pilih Instansi Terkait...</option>
-                    @foreach ($instansis as $instansi)
-                        <option value="{{ $instansi->instansi_id }}">{{ $instansi->name }}</option>
-                    @endforeach
-                </select>
-            </div>
+    <div class="mb-3">
+        <label for="jenis_instansi" class="form-label">Jenis Instansi</label>
+        <select class="form-select" id="jenis_instansi" name="jenis_instansi" required>
+            <option selected disabled value="">Pilih Jenis Instansi...</option>
+            <option value="fakultas">🏛️ Fakultas</option>
+            <option value="perpustakaan">📚 Perpustakaan</option>
+            <option value="lainnya">🏢 Lainnya</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="instansi_id" class="form-label">Nama Instansi</label>
+        <select class="form-select" id="instansi_id" name="instansi_id" required disabled>
+            <option selected disabled value="">Pilih Jenis Instansi terlebih dahulu...</option>
+        </select>
+    </div>
 
             <div class="mb-3">
                 <label for="title" class="form-label">Judul Laporan</label>
@@ -83,5 +101,49 @@
 
             <button type="submit" class="btn btn-primary btn-submit">Kirim Laporan</button>
         </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const jenisInstansiSelect = document.getElementById('jenis_instansi');
+            const instansiSelect = document.getElementById('instansi_id');
+            
+            jenisInstansiSelect.addEventListener('change', function() {
+                const jenis = this.value;
+                
+                if (!jenis) {
+                    instansiSelect.innerHTML = '<option selected disabled value="">Pilih Jenis Instansi terlebih dahulu...</option>';
+                    instansiSelect.disabled = true;
+                    return;
+                }
+                
+                // Enable instansi select
+                instansiSelect.disabled = false;
+                instansiSelect.innerHTML = '<option selected disabled value="">Memuat...</option>';
+                
+                // Fetch instansi berdasarkan jenis
+                fetch(`{{ route('reports.get-instansi-by-type') }}?jenis=${jenis}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        instansiSelect.innerHTML = '<option selected disabled value="">Pilih Nama Instansi...</option>';
+                        
+                        data.forEach(instansi => {
+                            const option = document.createElement('option');
+                            option.value = instansi.instansi_id;
+                            option.textContent = instansi.name;
+                            instansiSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        instansiSelect.innerHTML = '<option selected disabled value="">Error loading data</option>';
+                    });
+            });
+        });
+    </script>
+
+    {{-- Footer strip --}}
+    <div class="footer-strip">
+        © 2025 LaporUnair. All Rights Reserved.
     </div>
 @endsection

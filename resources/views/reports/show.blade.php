@@ -1,5 +1,20 @@
 @extends(Auth::user()->role->name == 'admin_sarpras' ? 'layouts.admin' : 'layouts.app')
 
+@push('styles')
+<style>
+    /* Full-bleed footer strip */
+    .footer-strip {
+        margin-top: 4rem;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        background-color: #0B4A8B;
+        color: #ffffff;
+        text-align: center;
+        padding: 18px 16px;
+    }
+</style>
+@endpush
+
 @section('content')
     {{-- KARTU DETAIL LAPORAN --}}
     <div class="card shadow-sm mb-4">
@@ -77,13 +92,8 @@
                     @csrf
                     <div class="col-12">
                         <label class="form-label">Penilaian</label>
-                        <div class="d-flex gap-2 align-items-center">
-                            @for ($i = 1; $i <= 5; $i++)
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="rating_value" id="rating{{ $i }}" value="{{ $i }}" required>
-                                    <label class="form-check-label" for="rating{{ $i }}">{{ $i }}</label>
-                                </div>
-                            @endfor
+                        <div class="mb-3">
+                            <x-star-rating :rating="0" :interactive="true" size="lg" />
                         </div>
                         @error('rating_value')
                             <div class="text-danger small">{{ $message }}</div>
@@ -104,9 +114,10 @@
                 </form>
                 @else
                     <div>
-                        <p class="mb-1">Rating Anda: <strong>{{ $userRating->rating_value }}/5</strong></p>
+                        <p class="mb-2">Rating Anda:</p>
+                        <x-star-rating :rating="$userRating->rating_value" :interactive="false" size="lg" />
                         @if($userRating->comment)
-                            <p class="mb-0">Komentar: {{ $userRating->comment }}</p>
+                            <p class="mt-3 mb-0"><strong>Komentar:</strong> {{ $userRating->comment }}</p>
                         @endif
                     </div>
                 @endif
@@ -114,7 +125,71 @@
         </div>
     @endif
 
-    {{-- BAGIAN KOMENTAR --}}
+    {{-- BAGIAN RATING UNTUK ADMIN --}}
+    @if(Auth::user()->role->name == 'admin_sarpras' && $report->status === 'completed')
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h4 class="mb-0">Rating dari User</h4>
+            </div>
+            <div class="card-body">
+                @if($report->ratings->count() > 0)
+                    @php
+                        $rating = $report->ratings->first();
+                    @endphp
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div>
+                            <p class="mb-1"><strong>Rating:</strong></p>
+                            <x-star-rating :rating="$rating->rating_value" :interactive="false" size="lg" />
+                            <small class="text-muted">({{ $rating->rating_value }}/5 bintang)</small>
+                        </div>
+                    </div>
+                    @if($rating->comment)
+                        <div>
+                            <p class="mb-1"><strong>Komentar User:</strong></p>
+                            <div class="bg-light p-3 rounded">
+                                <p class="mb-0">{{ $rating->comment }}</p>
+                            </div>
+                        </div>
+                    @endif
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <i class="bi bi-clock"></i> Rating diberikan pada {{ $rating->created_at->format('d M Y, H:i') }}
+                        </small>
+                    </div>
+                @else
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-star fs-1"></i>
+                        <p class="mb-0">User belum memberikan rating untuk laporan ini</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endif
+
+    {{-- PESAN UNTUK ADMIN JIKA LAPORAN SUDAH COMPLETED DAN DIRATING --}}
+    @if(Auth::user()->role->name == 'admin_sarpras' && $report->status === 'completed' && $report->ratings->count() > 0)
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <i class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+                <h5 class="text-success">Laporan Selesai dan Sudah Dirating</h5>
+                <p class="text-muted mb-0">User telah memberikan rating untuk laporan ini. Diskusi tidak tersedia untuk laporan yang sudah selesai dan dirating.</p>
+            </div>
+        </div>
+    @endif
+
+    {{-- PESAN UNTUK ADMIN JIKA LAPORAN COMPLETED TAPI BELUM DIRATING --}}
+    @if(Auth::user()->role->name == 'admin_sarpras' && $report->status === 'completed' && $report->ratings->count() == 0)
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <i class="bi bi-hourglass-split text-warning fs-1 mb-3"></i>
+                <h5 class="text-warning">Menunggu Rating dari User</h5>
+                <p class="text-muted mb-0">Laporan sudah selesai, menunggu user memberikan rating. Diskusi masih tersedia hingga user memberikan rating.</p>
+            </div>
+        </div>
+    @endif
+
+    {{-- BAGIAN KOMENTAR - Hanya tampil jika laporan belum completed atau belum dirating --}}
+    @if($report->status !== 'completed' || ($report->status === 'completed' && Auth::id() === $report->user_id && !$userRating))
     <div class="card shadow-sm">
         <div class="card-header bg-white">
             <h4 class="mb-0">Diskusi / Tindak Lanjut</h4>
@@ -155,6 +230,12 @@
                 <button type="submit" class="btn btn-primary">Kirim Komentar</button>
             </form>
         </div>
+    </div>
+    @endif
+
+    {{-- Footer strip --}}
+    <div class="footer-strip">
+        © 2025 LaporUnair. All Rights Reserved.
     </div>
 </div>
 @endsection

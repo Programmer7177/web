@@ -23,7 +23,7 @@ class DashboardController extends Controller
             $status = $request->string('status')->toString();
 
             // Query dasar dengan relasi untuk menghindari N+1
-            $query = FacilityReport::with(['reporter', 'category', 'instansi'])->latest();
+            $query = FacilityReport::with(['reporter', 'category', 'instansi', 'ratings'])->latest();
 
             // Terapkan filter opsional
             if (!empty($search)) {

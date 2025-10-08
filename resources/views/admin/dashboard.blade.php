@@ -1,5 +1,30 @@
 @extends('layouts.admin')
 
+@push('styles')
+<style>
+    /* Full-bleed footer strip */
+    .footer-strip {
+        position: relative;
+        width: 100vw;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+        margin-top: 4rem;
+        background-color: #0B4A8B;
+        color: #ffffff;
+        text-align: center;
+        padding: 18px 16px;
+        z-index: 1;
+    }
+    
+    /* Ensure body doesn't have horizontal scroll */
+    body {
+        overflow-x: hidden;
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="container">
     {{-- Metrik ringkas --}}
@@ -136,6 +161,7 @@
                             <th>Tanggal Laporan</th>
                             <th>Deskripsi</th>
                             <th>Status</th>
+                            <th>Rating</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -161,28 +187,52 @@
                                 <span class="badge {{ $badgeClass }}">{{ $status }}</span>
                             </td>
                             <td>
+                                @if($report->status === 'completed')
+                                    @if($report->ratings->count() > 0)
+                                        @php
+                                            $rating = $report->ratings->first();
+                                        @endphp
+                                        <div class="d-flex align-items-center gap-1">
+                                            <x-star-rating :rating="$rating->rating_value" :interactive="false" size="sm" />
+                                            <small class="text-muted">({{ $rating->rating_value }}/5)</small>
+                                        </div>
+                                        @if($rating->comment)
+                                            <small class="text-muted d-block" style="font-size: 0.75rem;">{{ Str::limit($rating->comment, 30) }}</small>
+                                        @endif
+                                    @else
+                                        <span class="badge bg-light text-dark">Belum dirating</span>
+                                    @endif
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                            <td>
                                 <div class="d-flex align-items-center gap-2 flex-wrap">
                                     <div class="btn-group" role="group" aria-label="Navigasi Laporan">
                                         <a class="btn btn-outline-secondary btn-sm" href="{{ route('reports.show', $report->report_id) }}" data-bs-toggle="tooltip" data-bs-title="Lihat Detail">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        <a class="btn btn-outline-primary btn-sm" href="{{ route('reports.edit', $report->report_id) }}" data-bs-toggle="tooltip" data-bs-title="Edit Laporan">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
+                                        @if($report->status !== 'completed')
+                                            <a class="btn btn-outline-primary btn-sm" href="{{ route('reports.edit', $report->report_id) }}" data-bs-toggle="tooltip" data-bs-title="Edit Laporan">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        @endif
                                     </div>
-                                    <form action="{{ route('reports.destroy', $report->report_id) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus laporan ini?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-outline-danger btn-sm" data-bs-toggle="tooltip" data-bs-title="Hapus Laporan">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
+                                    @if($report->status !== 'completed')
+                                        <form action="{{ route('reports.destroy', $report->report_id) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus laporan ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" data-bs-toggle="tooltip" data-bs-title="Hapus Laporan">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
                         @empty
                             <tr>
-                                <td colspan="10" class="text-center text-muted">Belum ada laporan yang masuk.</td>
+                                <td colspan="11" class="text-center text-muted">Belum ada laporan yang masuk.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -196,3 +246,8 @@
     </div>
 </div>
 @endsection
+
+{{-- Footer strip outside content section --}}
+<div class="footer-strip">
+    © 2025 LaporUnair. All Rights Reserved.
+</div>
