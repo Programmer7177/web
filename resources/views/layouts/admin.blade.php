@@ -162,4 +162,64 @@
     .footer {
         background: linear-gradient(90deg, #0f172a, #0b1324);
     }
+    
+    /* Fix untuk pagination dan elemen UI yang bermasalah */
+    .pagination {
+        margin-bottom: 0;
+    }
+    
+    .pagination .page-link {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.375rem;
+        margin: 0 0.125rem;
+        border: 1px solid #dee2e6;
+        color: #0d6efd;
+        text-decoration: none;
+    }
+    
+    .pagination .page-link:hover {
+        background-color: #e9ecef;
+        border-color: #adb5bd;
+        color: #0a58ca;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: white;
+    }
+    
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        background-color: #fff;
+        border-color: #dee2e6;
+    }
+    
+    /* Pastikan tidak ada elemen yang terlalu besar */
+    .pagination .page-link,
+    .pagination .page-item {
+        max-width: none;
+        max-height: none;
+        font-size: inherit;
+        line-height: inherit;
+    }
+    
+    /* Fix untuk chevron/panah yang terlalu besar */
+    .pagination .page-link::before,
+    .pagination .page-link::after {
+        font-size: inherit;
+        line-height: inherit;
+    }
+    
+    /* Pastikan input field tidak kosong dan terlihat aneh */
+    .form-control:empty {
+        display: none;
+    }
+    
+    /* Fix untuk elemen yang mungkin tumpang tindih */
+    .card {
+        position: relative;
+        z-index: 1;
+    }
 </style>
