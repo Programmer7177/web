@@ -276,13 +276,9 @@
                             <label for="password" class="form-label">Password</label>
                             <input id="password" class="form-control" type="password" name="password" required>
                         </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <a href="{{ route('password.request') }}" class="text-sm">Lupa password?</a>
+                        <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-primary rounded-pill px-4">Login</button>
                         </div>
-                        <p class="text-center mt-4 text-sm">
-                            Belum punya akun? <a href="{{ route('register') }}">Daftar di sini</a>
-                        </p>
                     </form>
                 </div>
             </section>
