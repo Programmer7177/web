@@ -15,13 +15,14 @@ class FacilityReport extends Model
         'user_id',
         'category_id',
         'asset_id',
-        'instansi_id', // Pastikan ini sudah ada
+        'instansi_id',
+        'instansi_type_id',
         'assigned_to',
         'title',
         'description',
         'location',
         'status',
-        'attachment_path', // Pastikan ini sudah ada
+        'attachment_path',
     ];
 
     /**
@@ -71,6 +72,14 @@ class FacilityReport extends Model
     public function instansi()
     {
         return $this->belongsTo(Instansi::class, 'instansi_id');
+    }
+
+    /**
+     * Laporan ini terkait dengan satu InstansiType.
+     */
+    public function instansiType()
+    {
+        return $this->belongsTo(InstansiType::class, 'instansi_type_id');
     }
 
     public function comments()

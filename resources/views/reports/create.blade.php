@@ -52,12 +52,19 @@
             </div>
 
             <div class="mb-3">
-                <label for="instansi_id" class="form-label">Instansi</label>
-                <select class="form-select" id="instansi_id" name="instansi_id" required>
-                    <option selected disabled value="">Pilih Instansi Terkait...</option>
-                    @foreach ($instansis as $instansi)
-                        <option value="{{ $instansi->instansi_id }}">{{ $instansi->name }}</option>
+                <label for="instansi_type_id" class="form-label">Jenis Instansi</label>
+                <select class="form-select" id="instansi_type_id" name="instansi_type_id" required>
+                    <option selected disabled value="">Pilih Jenis Instansi...</option>
+                    @foreach ($instansiTypes as $instansiType)
+                        <option value="{{ $instansiType->instansi_type_id }}">{{ $instansiType->name }}</option>
                     @endforeach
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="instansi_id" class="form-label">Nama Instansi</label>
+                <select class="form-select" id="instansi_id" name="instansi_id" required disabled>
+                    <option selected disabled value="">Pilih Jenis Instansi terlebih dahulu...</option>
                 </select>
             </div>
 
@@ -84,4 +91,43 @@
             <button type="submit" class="btn btn-primary btn-submit">Kirim Laporan</button>
         </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const instansiTypeSelect = document.getElementById('instansi_type_id');
+            const instansiSelect = document.getElementById('instansi_id');
+            
+            instansiTypeSelect.addEventListener('change', function() {
+                const instansiTypeId = this.value;
+                
+                if (instansiTypeId) {
+                    // Enable instansi select
+                    instansiSelect.disabled = false;
+                    instansiSelect.innerHTML = '<option selected disabled value="">Memuat...</option>';
+                    
+                    // Fetch instansi by type
+                    fetch(`{{ route('reports.get-instansi-by-type') }}?instansi_type_id=${instansiTypeId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            instansiSelect.innerHTML = '<option selected disabled value="">Pilih Nama Instansi...</option>';
+                            
+                            data.instansis.forEach(instansi => {
+                                const option = document.createElement('option');
+                                option.value = instansi.instansi_id;
+                                option.textContent = instansi.name;
+                                instansiSelect.appendChild(option);
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            instansiSelect.innerHTML = '<option selected disabled value="">Error loading data</option>';
+                        });
+                } else {
+                    // Disable instansi select
+                    instansiSelect.disabled = true;
+                    instansiSelect.innerHTML = '<option selected disabled value="">Pilih Jenis Instansi terlebih dahulu...</option>';
+                }
+            });
+        });
+    </script>
 @endsection

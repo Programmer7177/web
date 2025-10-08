@@ -46,6 +46,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // 🧾 CRUD untuk laporan fasilitas
     Route::resource('reports', FacilityReportController::class);
+    
+    // AJAX endpoint untuk mendapatkan instansi berdasarkan type
+    Route::get('reports/get-instansi-by-type', [FacilityReportController::class, 'getInstansiByType'])->name('reports.get-instansi-by-type');
 
     // 💬 Komentar untuk laporan
     Route::post('reports/{report}/comments', [ReportCommentController::class, 'store'])->name('comments.store');

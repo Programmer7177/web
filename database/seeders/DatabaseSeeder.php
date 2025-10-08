@@ -8,6 +8,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RoleSeeder::class,
+            InstansiTypeSeeder::class,
             InstansiSeeder::class,
             UserSeeder::class, // Ini membuat user mahasiswa dummy
             AdminUserSeeder::class, // TAMBAHKAN PEMANGGILAN INI

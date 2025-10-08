@@ -46,8 +46,20 @@
                         </select>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="instansi_id" class="form-label">Instansi</label>
-                        <select name="instansi_id" class="form-select" {{ $isAdmin ? 'disabled' : '' }}>
+                        <label for="instansi_type_id" class="form-label">Jenis Instansi</label>
+                        <select name="instansi_type_id" id="instansi_type_id" class="form-select" {{ $isAdmin ? 'disabled' : '' }}>
+                            <option value="">Pilih Jenis Instansi...</option>
+                            @foreach ($instansiTypes as $instansiType)
+                                <option value="{{ $instansiType->instansi_type_id }}" {{ old('instansi_type_id', $report->instansi_type_id) == $instansiType->instansi_type_id ? 'selected' : '' }}>
+                                    {{ $instansiType->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="instansi_id" class="form-label">Nama Instansi</label>
+                        <select name="instansi_id" id="instansi_id" class="form-select" {{ $isAdmin ? 'disabled' : '' }}>
+                            <option value="">Pilih Nama Instansi...</option>
                             @foreach ($instansis as $instansi)
                                 <option value="{{ $instansi->instansi_id }}" {{ old('instansi_id', $report->instansi_id) == $instansi->instansi_id ? 'selected' : '' }}>
                                     {{ $instansi->name }}
@@ -90,5 +102,54 @@
             </form>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const instansiTypeSelect = document.getElementById('instansi_type_id');
+            const instansiSelect = document.getElementById('instansi_id');
+            
+            // Function to load instansi by type
+            function loadInstansiByType(instansiTypeId, selectedInstansiId = null) {
+                if (instansiTypeId) {
+                    instansiSelect.innerHTML = '<option value="">Memuat...</option>';
+                    
+                    fetch(`{{ route('reports.get-instansi-by-type') }}?instansi_type_id=${instansiTypeId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            instansiSelect.innerHTML = '<option value="">Pilih Nama Instansi...</option>';
+                            
+                            data.instansis.forEach(instansi => {
+                                const option = document.createElement('option');
+                                option.value = instansi.instansi_id;
+                                option.textContent = instansi.name;
+                                if (selectedInstansiId && instansi.instansi_id == selectedInstansiId) {
+                                    option.selected = true;
+                                }
+                                instansiSelect.appendChild(option);
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            instansiSelect.innerHTML = '<option value="">Error loading data</option>';
+                        });
+                } else {
+                    instansiSelect.innerHTML = '<option value="">Pilih Jenis Instansi terlebih dahulu...</option>';
+                }
+            }
+            
+            // Load instansi on page load if type is already selected
+            const currentTypeId = instansiTypeSelect.value;
+            const currentInstansiId = '{{ $report->instansi_id }}';
+            if (currentTypeId) {
+                loadInstansiByType(currentTypeId, currentInstansiId);
+            }
+            
+            // Handle type change
+            instansiTypeSelect.addEventListener('change', function() {
+                const instansiTypeId = this.value;
+                loadInstansiByType(instansiTypeId);
+            });
+        });
+    </script>
 @endsection
 
